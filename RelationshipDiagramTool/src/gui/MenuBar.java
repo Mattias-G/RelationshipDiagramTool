@@ -2,38 +2,29 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
-import backend.Backend;
+import utils.SaveStateHandler;
 
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
-	private Backend backend;
+	private SaveStateHandler saver;
 
 	private JMenuItem newItem;
 	private JMenuItem openItem;
 	private JMenuItem saveItem;
 	private JMenuItem saveAsItem;
-	
-	private JFileChooser fileChooser;
 
 	private GuiPanel graphPanel;
 	private GuiPanel categoryPanel;
 	
-	public MenuBar(Backend backend, GuiPanel p1, GuiPanel p2) {
-		this.backend = backend;
+	public MenuBar(SaveStateHandler saver, GuiPanel p1, GuiPanel p2) {
+		this.saver = saver;
 		this.graphPanel = p1;
 		this.categoryPanel = p2;
-		
-		fileChooser = new JFileChooser();
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Json", "json"));
 		
 		JMenu fileMenu = new JMenu("File");
 
@@ -60,25 +51,21 @@ public class MenuBar extends JMenuBar {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == newItem) {
-				backend.reset();
+				saver.reset();
 				graphPanel.repaint();
 				categoryPanel.repaint();
 			}
 			else if (e.getSource() == openItem) {
-				if (fileChooser.showOpenDialog(getTopLevelAncestor()) == JFileChooser.APPROVE_OPTION) {
-					backend.load(fileChooser.getSelectedFile());
+				if (saver.open(getTopLevelAncestor())) {
 					graphPanel.repaint();
 					categoryPanel.repaint();
 				}
 			}
-			else if (e.getSource() == saveItem || e.getSource() == saveAsItem) {
-				if (fileChooser.showSaveDialog(getTopLevelAncestor()) == JFileChooser.APPROVE_OPTION) {
-					FileFilter fileFilter = fileChooser.getFileFilter();
-					File file = fileChooser.getSelectedFile();
-					if (!fileFilter.accept(file))
-						file = new File(file.getAbsolutePath() + ".json");
-					backend.save(file);
-				}
+			else if (e.getSource() == saveItem) {
+				saver.save(getTopLevelAncestor());
+			}
+			else if (e.getSource() == saveAsItem) {
+				saver.saveAs(getTopLevelAncestor());
 			}
 		}
 	}

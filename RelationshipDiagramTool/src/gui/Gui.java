@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
 import backend.Backend;
+import utils.SaveStateHandler;
 
 @SuppressWarnings("serial")
 public class Gui extends JFrame {
@@ -28,7 +29,8 @@ public class Gui extends JFrame {
 	}
 
 	private void addMenuBar(Backend backend, GraphPanel graphPanel, CategoryPanel categoryPanel) {
-		JMenuBar menuBar = new MenuBar(backend, graphPanel, categoryPanel);  
+		SaveStateHandler saver = new SaveStateHandler(backend);
+		JMenuBar menuBar = new MenuBar(saver, graphPanel, categoryPanel);  
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 

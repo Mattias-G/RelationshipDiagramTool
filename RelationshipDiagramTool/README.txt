@@ -39,9 +39,9 @@
 - Left click on the square next to 'color' to change the color of the category and its nodes
 
 
-< Toolbar >
+< Menu bar >
 
 File > New - create a new, empty graph
 File > Open - open an existing graph from a file
-File > Save - save the graph to a file
-File > Save As - same as save, for now
+File > Save - save the graph to the last file opened or saved to
+File > Save As - save the graph to a file
