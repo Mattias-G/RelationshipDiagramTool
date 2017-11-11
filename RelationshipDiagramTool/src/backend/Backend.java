@@ -7,21 +7,22 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import gui.categories.Category;
 import gui.graph.Edge;
 import gui.graph.Node;
+import gui.graph.Timestamp;
 
 public class Backend {
 	private int idCounter;
 	private List<Category> categories = new ArrayList<>();
-	private List<Node> nodes = new ArrayList<>();
-	private List<Edge> edges = new ArrayList<>();
+	private List<Timestamp> timestamps = new ArrayList<>();
 	
 	private Category defaultCategory;
 	private Category noCategory;
+	
+	private int currentTime;
 
 	public Backend() {
 		noCategory = new Category(idCounter++);
@@ -29,15 +30,19 @@ public class Backend {
 		
 		defaultCategory = new Category(idCounter++);
 		categories.add(defaultCategory);
+		
+		timestamps.add(new Timestamp(0, "Time step " + timestamps.size()));
+		currentTime = 0;
 	}
 
 
 	public void reset() {
 		categories.clear();
-		nodes.clear();
-		edges.clear();
+		timestamps.clear();
 		idCounter = 1;
 		defaultCategory = noCategory;
+		timestamps.add(new Timestamp(0, "Time step " + timestamps.size()));
+		currentTime = 0;
 	}
 
 	public void save(File file) {
@@ -56,13 +61,19 @@ public class Backend {
 			for (Category category : categories) {
 				fw.write(category.toString() + "\n");
 			}
-			fw.write("Nodes\n");
-			for (Node node : nodes) {
-				fw.write(node.toString() + "\n");
-			}
-			fw.write("Edges\n");
-			for (Edge edge : edges) {
-				fw.write(edge.toString() + "\n");
+			fw.write("Timestamps\n");
+			for (Timestamp timestamp : timestamps) {
+				fw.write("#\n");
+				fw.write(timestamp.toString() + "\n");
+								
+				fw.write("Nodes\n");
+				for (Node node : timestamp.getNodes()) {
+					fw.write(node.toString() + "\n");
+				}
+				fw.write("Edges\n");
+				for (Edge edge : timestamp.getEdges()) {
+					fw.write(edge.toString() + "\n");
+				}
 			}
 			
 			fw.close();
@@ -86,23 +97,14 @@ public class Backend {
 				fw.write(categories.get(categories.size()-1).toJson() + "\n");
 
 			fw.write("],\n"
-					+ "\"nodes\": [\n");
-
-			for (int i = 0; i < nodes.size()-1; i++) {
-				fw.write(nodes.get(i).toJson() + ",\n");
+					+ "\"timestamps\": [\n");
+			for (int i = 0; i < timestamps.size()-1; i++) {
+				fw.write(timestamps.get(i).toJson() + ",\n");
 			}
-			if (nodes.size() > 0)
-				fw.write(nodes.get(nodes.size()-1).toJson() + "\n");
-
-			fw.write("],\n"
-					+ "\"edges\": [\n");
 			
-			for (int i = 0; i < edges.size()-1; i++) {
-				fw.write(edges.get(i).toJson() + ",\n");
-			}
-			if (edges.size() > 0)
-				fw.write(edges.get(edges.size()-1).toJson() + "\n");
-
+			if (timestamps.size() > 0)
+				fw.write(timestamps.get(timestamps.size()-1).toJson() + "\n");
+			
 			fw.write("]\n"
 					+ "}\n");
 			
@@ -114,6 +116,8 @@ public class Backend {
 	}
 	
 	public void load(File file) {
+		timestamps.clear();
+		
 		System.out.println("Loading file: " + file);
 		boolean fromJson = file.getName().endsWith(".json");
 		if (fromJson)
@@ -131,10 +135,14 @@ public class Backend {
 				String line = reader.readLine();
 				if (line.equals("Categories"))
 					step = 1;
-				else if (line.equals("Nodes"))
+				else if (line.equals("Timestamps"))
+					step = -1;
+				else if (line.equals("#"))
 					step = 2;
-				else if (line.equals("Edges"))
+				else if (line.equals("Nodes"))
 					step = 3;
+				else if (line.equals("Edges"))
+					step = 4;
 				else if (step == 1) {
 					String[] tokens = line.split(" ");
 					int i = tokens[0].length() + tokens[1].length() + tokens[2].length() + 3;
@@ -146,6 +154,13 @@ public class Backend {
 				}
 				else if (step == 2) {
 					String[] tokens = line.split(" ");
+					int i = tokens[0].length() + 1;
+					createTimestamp(
+							Integer.parseInt(tokens[0]),
+							line.substring(i));
+				}
+				else if (step == 3) {
+					String[] tokens = line.split(" ");
 					int i = tokens[0].length() + tokens[1].length() + 
 							tokens[2].length() + tokens[3].length() + 4;
 					createNode(
@@ -155,7 +170,7 @@ public class Backend {
 							findCategory(Integer.parseInt(tokens[3])),
 							line.substring(i));
 				}
-				else if (step == 3) {
+				else if (step == 4) {
 					String[] tokens = line.split(" ");
 					int i = tokens[0].length() + tokens[1].length() + tokens[2].length() + 3;
 					createEdge(
@@ -164,7 +179,7 @@ public class Backend {
 							findNode(Integer.parseInt(tokens[2])),
 							line.substring(i));
 				}
-				else {
+				else if (step != -1) {
 					reset();
 					System.out.println("Error when loading file \"" + file + "\".\n"
 							+ "Could not categorize line: " + line);
@@ -201,34 +216,47 @@ public class Backend {
 				reader.readLine();
 			}
 			
-			//Read nodes
+			//Read timestamps
 			reader.readLine();
 			while (reader.readLine().equals("{")) {
-				String[] tokens = new String[5];
+				String[] tokens = new String[2];
 				getTokens(reader, tokens);
 						
-				createNode(
+				createTimestamp(
 						Integer.parseInt(tokens[0]),
-						Integer.parseInt(tokens[1]),
-						Integer.parseInt(tokens[2]),
-						findCategory(Integer.parseInt(tokens[3])),
-						tokens[4]);
-				
+						tokens[1]);
+							
+				//Read nodes
 				reader.readLine();
-			}
-			
-			//Read edges
-			reader.readLine();
-			while (reader.readLine().equals("{")) {
-				String[] tokens = new String[4];
-				getTokens(reader, tokens);
+				while (reader.readLine().equals("{")) {
+					tokens = new String[5];
+					getTokens(reader, tokens);
+							
+					createNode(
+							Integer.parseInt(tokens[0]),
+							Integer.parseInt(tokens[1]),
+							Integer.parseInt(tokens[2]),
+							findCategory(Integer.parseInt(tokens[3])),
+							tokens[4]);
+					
+					reader.readLine();
+				}
 				
-				createEdge(
-						Integer.parseInt(tokens[0]),
-						findNode(Integer.parseInt(tokens[1])),
-						findNode(Integer.parseInt(tokens[2])),
-						tokens[3]);
-				
+				//Read edges
+				reader.readLine();
+				while (reader.readLine().equals("{")) {
+					tokens = new String[4];
+					getTokens(reader, tokens);
+					
+					createEdge(
+							Integer.parseInt(tokens[0]),
+							findNode(Integer.parseInt(tokens[1])),
+							findNode(Integer.parseInt(tokens[2])),
+							tokens[3]);
+					
+					reader.readLine();
+				}
+
 				reader.readLine();
 			}
 		} catch (IOException e) {
@@ -284,10 +312,9 @@ public class Backend {
 				defaultCategory = categories.get(0);
 		}
 		
-		for (Node node : nodes) {
-			if (node.getCategory() == toDelete) {
-				node.setCategory(noCategory);
-			}
+		
+		for (Timestamp timestamp : timestamps) {
+			timestamp.removeCategory(toDelete, noCategory);
 		}
 	}
 
@@ -311,92 +338,74 @@ public class Backend {
 		return noCategory;
 	}
 	
+
+	public Timestamp createTimestamp(int id, String name) {
+		Timestamp timestamp = new Timestamp(id, name);
+		timestamps.add(timestamp);
+		currentTime = timestamps.size()-1;
+		return timestamp;
+	}
+	
 	public Node createNode(int x, int y) {
 		Node node = new Node(x, y, defaultCategory, idCounter++);
-		nodes.add(node);
+		timestamps.get(currentTime).addNode(node);
 		return node;
 	}
 
 	private void createNode(int id, int x, int y, Category category, String name) {
 		Node node = new Node(x, y, category, id);
 		node.setName(name);
-		nodes.add(node);
+		timestamps.get(currentTime).addNode(node);
 
 		if (id >= idCounter)
 			idCounter = id+1;
 	}
 	
 	public void deleteNode(Node toDelete) {
-		nodes.remove(toDelete);
-		
-		Iterator<Edge> i = edges.iterator();
-		while (i.hasNext()) {
-			Edge e = i.next();
-			if (e.getStartNode() == toDelete || e.getEndNode() == toDelete)
-				i.remove();
-		}
+		timestamps.get(currentTime).deleteNode(toDelete);
 	}
 	
 	public List<Node> getNodes() {
-		return nodes;
+		return timestamps.get(currentTime).getNodes();
 	}
 	
 	public Node findNodeAtPoint(int x, int y) {
-		for (Node node : nodes) { //TODO: invert order to give top component input first
-			if (node.pointInBounds(x, y) && node.isVisible()) {
-				return node;
-			}	
-		}
-		return null;
+		return timestamps.get(currentTime).findNodeAtPoint(x, y);
 	}
 
 	private Node findNode(int id) {
-		for (Node node : nodes) {
-			if (node.getId() == id)
-				return node;
-		}
-		return null;
+		return timestamps.get(currentTime).findNode(id);
 	}
 	
 	
 	public Edge createEdge(Node start, Node end) {
 		Edge edge = new Edge(start, end, idCounter++);
-		edges.add(edge);
+		timestamps.get(currentTime).addEdge(edge);
 		return edge;
 	}
 
 	private void createEdge(int id, Node start, Node end, String name) {
 		Edge edge = new Edge(start, end, id);
 		edge.setName(name);
-		edges.add(edge);
+		timestamps.get(currentTime).addEdge(edge);
 
 		if (id >= idCounter)
 			idCounter = id+1;
 	}
 
 	public void deleteEdge(Edge toDelete) {
-		edges.remove(toDelete);
+		timestamps.get(currentTime).removeEdge(toDelete);
 	}
 
 	public List<Edge> getEdges() {
-		return edges;
+		return timestamps.get(currentTime).getEdges();
 	}
 	
 	public Edge findEdgeAtPoint(int x, int y) {
-		for (Edge edge : edges) { //TODO: invert order to give top component input first
-			if (edge.pointInBounds(x, y) && edge.isVisible()) {
-				return edge;
-			}	
-		}
-		return null;
+		return timestamps.get(currentTime).findEdgeAtPoint(x, y);
 	}
 
 	public boolean existsEdge(Node node1, Node node2) {
-		for (Edge edge : edges) {
-			if ((edge.getStartNode() == node1 || edge.getEndNode() == node1) &&
-					(edge.getStartNode() == node2 || edge.getEndNode() == node2))
-				return true;
-		}
-		return false;
+		return timestamps.get(currentTime).existsEdge(node1, node2);
 	}
 }

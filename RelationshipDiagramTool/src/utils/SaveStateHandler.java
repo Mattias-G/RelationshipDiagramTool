@@ -66,7 +66,7 @@ public class SaveStateHandler {
 		return recentlySaved;
 	}
 	
-	public void editPerformed() {
+	public void flagEditPerformed() {
 		recentlySaved = false;
 	}
 }
