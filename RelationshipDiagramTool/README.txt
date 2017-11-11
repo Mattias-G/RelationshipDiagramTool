@@ -23,6 +23,8 @@
 
 - Press and hold the left mouse button on an empty space to make a regional selection, release the mouse to select all node in the selected area
 
+- Press + or - to move between time layers. These are different graphs that represent different points in time (or space if you prefer).
+
 
 < Category panel >
 

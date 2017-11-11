@@ -7,20 +7,18 @@ import java.util.List;
 import gui.categories.Category;
 
 public class Timestamp {
-	private int id;
 	private String name;
 	
 	private List<Node> nodes = new ArrayList<>();
 	private List<Edge> edges = new ArrayList<>();
 	
-	public Timestamp(int id, String name) {
-		this.id = id;
+	public Timestamp(String name) {
 		this.name = name;
 	}
 	
 	@Override
 	public String toString() {
-		return id + " " + name;
+		return name;
 	}
 
 	public void removeCategory(Category toDelete, Category noCategory) {
@@ -101,7 +99,6 @@ public class Timestamp {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("{\n" +
-		"\"id\": " + id + ",\n" +
 		"\"name\": \"" + name + "\"\n");
 				
 		sb.append("\"nodes\": [\n");

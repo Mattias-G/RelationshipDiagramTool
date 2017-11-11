@@ -31,7 +31,7 @@ public class Backend {
 		defaultCategory = new Category(idCounter++);
 		categories.add(defaultCategory);
 		
-		timestamps.add(new Timestamp(0, "Time step " + timestamps.size()));
+		timestamps.add(new Timestamp("Time step " + timestamps.size()));
 		currentTime = 0;
 	}
 
@@ -41,7 +41,7 @@ public class Backend {
 		timestamps.clear();
 		idCounter = 1;
 		defaultCategory = noCategory;
-		timestamps.add(new Timestamp(0, "Time step " + timestamps.size()));
+		timestamps.add(new Timestamp("Time step " + timestamps.size()));
 		currentTime = 0;
 	}
 
@@ -156,7 +156,6 @@ public class Backend {
 					String[] tokens = line.split(" ");
 					int i = tokens[0].length() + 1;
 					createTimestamp(
-							Integer.parseInt(tokens[0]),
 							line.substring(i));
 				}
 				else if (step == 3) {
@@ -219,12 +218,10 @@ public class Backend {
 			//Read timestamps
 			reader.readLine();
 			while (reader.readLine().equals("{")) {
-				String[] tokens = new String[2];
+				String[] tokens = new String[1];
 				getTokens(reader, tokens);
 						
-				createTimestamp(
-						Integer.parseInt(tokens[0]),
-						tokens[1]);
+				createTimestamp(tokens[0]);
 							
 				//Read nodes
 				reader.readLine();
@@ -339,8 +336,8 @@ public class Backend {
 	}
 	
 
-	public Timestamp createTimestamp(int id, String name) {
-		Timestamp timestamp = new Timestamp(id, name);
+	public Timestamp createTimestamp(String name) {
+		Timestamp timestamp = new Timestamp(name);
 		timestamps.add(timestamp);
 		currentTime = timestamps.size()-1;
 		return timestamp;
@@ -407,5 +404,24 @@ public class Backend {
 
 	public boolean existsEdge(Node node1, Node node2) {
 		return timestamps.get(currentTime).existsEdge(node1, node2);
+	}
+
+
+	public void nextTimestamp() {
+		currentTime++;
+		if (currentTime == timestamps.size()) {
+			createTimestamp("Time step " + (timestamps.size()));
+		}
+	}
+
+	public void prevTimestamp() {
+		currentTime--;
+		if (currentTime < 0) {
+			Timestamp ts = createTimestamp("Time step " + (timestamps.size()));
+			timestamps.remove(timestamps.size()-1);
+			timestamps.add(0, ts);
+			currentTime = 0;
+		}
+		
 	}
 }

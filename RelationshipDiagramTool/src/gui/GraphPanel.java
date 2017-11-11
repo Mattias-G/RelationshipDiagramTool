@@ -391,6 +391,15 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				}
 			}
 			
+			if (!editing && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) {
+					backend.nextTimestamp();
+					repaint = true;
+			}
+			if (!editing && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
+				backend.prevTimestamp();
+				repaint = true;
+			}
+			
 			if (editing && (e.getKeyCode() == KeyEvent.VK_ESCAPE || 
 					e.getKeyCode() == KeyEvent.VK_ENTER)) {
 				editing = false;
