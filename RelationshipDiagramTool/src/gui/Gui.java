@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
 
 import backend.Backend;
 import utils.SaveStateHandler;
@@ -73,7 +74,10 @@ public class Gui extends JFrame {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weighty = 1;
 		
-		add(categoryPanel, gbc);
+		JScrollPane sp = new JScrollPane(categoryPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+		    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				
+		add(sp, gbc);
 		categoryPanel.registerKeyListener();
 		return categoryPanel;
 	}
