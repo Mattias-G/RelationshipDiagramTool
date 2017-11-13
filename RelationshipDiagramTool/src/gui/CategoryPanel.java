@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.Scrollable;
 
 import backend.Backend;
 import gui.categories.Category;
@@ -21,7 +23,7 @@ import gui.categories.InputReturnCode;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class CategoryPanel extends JPanel implements GuiPanel {
+public class CategoryPanel extends JPanel implements GuiPanel, Scrollable {
 	private static final Color bkgColor = new Color(0.8f, 0.8f, 1.0f);  
 	public static final double DOUBLE_CLICK_TIME_MILLIS = 500; 
 	
@@ -38,8 +40,8 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 	public CategoryPanel(Backend backend) {		
 		this.backend = backend;
 
-		setMinimumSize(new Dimension(160, 0));
-		setPreferredSize(new Dimension(160, 0));
+		setMinimumSize(new Dimension(160, 48));
+		setPreferredSize(new Dimension(160, 48));
 		
 		setBorder(BorderFactory.createEtchedBorder());
 		
@@ -62,6 +64,31 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 			selectedCategory = null;
 		}
 	}
+
+  @Override
+  public Dimension getPreferredSize()
+  {
+    int h1 = getParent().getHeight();
+    int h2 = Category.HEIGHT * (backend.getCategories().size()+1);
+    int w = Category.WIDTH;
+    if (h2 > h1) {
+      w += 16;
+    }
+
+    return new Dimension(w, Math.max(h1, h2));
+  }
+
+  @Override
+  public Dimension getMinimumSize()
+  {
+    return getPreferredSize();
+  }
+  
+  @Override
+  public Dimension getPreferredScrollableViewportSize()
+  {
+    return getPreferredSize();
+  }
 	
 	@Override
 	protected void paintComponent(Graphics g) {
@@ -152,6 +179,8 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 					selectedCategory.setColor(Color.getHSBColor((float)Math.random(), 0.5f, 1f));
 					selectedCategory.setEditing(true);
 					editing = true;
+					
+					getParent().revalidate();
 				}
 				
 				if (selectedCategory != null) {
@@ -216,6 +245,7 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 					selectedCategory = null;
 					repaint = true;
 					siblings.repaint();
+					getParent().revalidate();
 				}
 			}
 			
@@ -240,4 +270,33 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 	public void performAction(SiblingActions actionCode, Object... params) {
 		
 	}
+
+  @Override
+  public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean getScrollableTracksViewportWidth()
+  {
+    // TODO Auto-generated method stub
+    return true;
+  }
+
+  @Override
+  public boolean getScrollableTracksViewportHeight()
+  {
+    // TODO Auto-generated method stub
+    return false;
+    // https://stackoverflow.com/questions/10331129/jscrollpane-resize-containing-jpanel-when-scrollbars-appear
+  }
 }
