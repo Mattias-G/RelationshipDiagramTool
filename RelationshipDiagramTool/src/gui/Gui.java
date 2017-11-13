@@ -21,9 +21,11 @@ public class Gui extends JFrame {
 
 		GraphPanel gp = addGraphPanel(backend);
 		CategoryPanel cp = addCategoryPanel(backend);
+		TimestampPanel tp = addTimestampPanel(backend);
 		addMenuBar(backend, gp, cp);
-		gp.setSiblingComponent(cp);
-		cp.setSiblingComponent(gp);
+		gp.setSiblingComponent(new GuiPanelGroup(cp, tp));
+		cp.setSiblingComponent(new GuiPanelGroup(gp));
+		tp.setSiblingComponent(new GuiPanelGroup(gp));
 		
 		setVisible(true);
 	}
@@ -61,7 +63,7 @@ public class Gui extends JFrame {
 		graphPanel.registerKeyListener();
 		return graphPanel;
 	}
-	
+
 	private CategoryPanel addCategoryPanel(Backend backend) {
 		CategoryPanel categoryPanel = new CategoryPanel(backend); 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -69,13 +71,29 @@ public class Gui extends JFrame {
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
+		gbc.gridheight = 2;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weighty = 1;
 		
 		add(categoryPanel, gbc);
 		categoryPanel.registerKeyListener();
 		return categoryPanel;
+	}
+
+	private TimestampPanel addTimestampPanel(Backend backend) {
+		TimestampPanel timestampPanel = new TimestampPanel(backend); 
+		GridBagConstraints gbc = new GridBagConstraints();
+
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1;
+		
+		add(timestampPanel, gbc);
+		timestampPanel.registerKeyListener();
+		return timestampPanel;
 	}
 
 

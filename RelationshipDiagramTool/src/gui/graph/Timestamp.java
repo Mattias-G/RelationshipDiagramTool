@@ -5,20 +5,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import gui.categories.Category;
+import gui.categories.GuiButtonObject;
 
-public class Timestamp {
-	private String name;
+public class Timestamp extends GuiButtonObject {
+	public static final int WIDTH = 160;
+	public static final int HEIGHT = 48;
 	
 	private List<Node> nodes = new ArrayList<>();
 	private List<Edge> edges = new ArrayList<>();
 	
 	public Timestamp(String name) {
+		super(-1);
 		this.name = name;
-	}
-	
-	@Override
-	public String toString() {
-		return name;
 	}
 
 	public void removeCategory(Category toDelete, Category noCategory) {
@@ -95,6 +93,12 @@ public class Timestamp {
 		return false;
 	}
 
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 	public String toJson() {
 		StringBuilder sb = new StringBuilder();
 		
@@ -121,5 +125,15 @@ public class Timestamp {
 		sb.append("]\n" +
 				"}");
 		return sb.toString();
+	}
+
+	@Override
+	protected int componentWidth() {
+		return WIDTH;
+	}
+
+	@Override
+	protected int componentHeight() {
+		return HEIGHT;
 	}
 }

@@ -22,7 +22,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	public static final double DOUBLE_CLICK_TIME_MILLIS = 500;
 
 	private Backend backend;
-	private GuiPanel sibling;
+	private GuiPanelGroup siblings;
 	
 	private Node selectedNode;
 	private Edge selectedEdge;
@@ -70,8 +70,8 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		getTopLevelAncestor().addKeyListener(new KeyListener());
 	}
 
-	public void setSiblingComponent(GuiPanel sibling) {
-		this.sibling = sibling;
+	public void setSiblingComponent(GuiPanelGroup siblings) {
+		this.siblings = siblings;
 	}
 	
 
@@ -178,7 +178,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	private class MouseListener extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
-			sibling.unfocus();
+			siblings.unfocus();
 			if (selectedNode == null || !areaSelectedNodes.contains(selectedNode))
 				unselectNode();
 			unselectEdge();
@@ -391,13 +391,15 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				}
 			}
 			
-			if (!editing && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) {
-					backend.nextTimestamp();
-					repaint = true;
+			if (!editing && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) { //FIXME: should only work if not editing in other panels!
+				backend.nextTimestamp();
+				repaint = true;
+				siblings.repaint();
 			}
 			if (!editing && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
 				backend.prevTimestamp();
 				repaint = true;
+				siblings.repaint();
 			}
 			
 			if (editing && (e.getKeyCode() == KeyEvent.VK_ESCAPE || 

@@ -115,8 +115,10 @@ public class Backend {
 		}
 	}
 	
-	public void load(File file) {
+	public void load(File file) {	
+		reset();
 		timestamps.clear();
+		currentTime = 0;
 		
 		System.out.println("Loading file: " + file);
 		boolean fromJson = file.getName().endsWith(".json");
@@ -127,8 +129,6 @@ public class Backend {
 	}
 
 	private void loadFromString(File file) {
-		reset();
-		
 		int step = 0;
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			while (reader.ready()) {
@@ -195,8 +195,6 @@ public class Backend {
 	}
 	
 	private void loadFromJson(File file) {
-		reset();
-		
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			reader.readLine();
 			
@@ -335,13 +333,6 @@ public class Backend {
 		return noCategory;
 	}
 	
-
-	public Timestamp createTimestamp(String name) {
-		Timestamp timestamp = new Timestamp(name);
-		timestamps.add(timestamp);
-		currentTime = timestamps.size()-1;
-		return timestamp;
-	}
 	
 	public Node createNode(int x, int y) {
 		Node node = new Node(x, y, defaultCategory, idCounter++);
@@ -407,21 +398,56 @@ public class Backend {
 	}
 
 
+	public Timestamp createTimestamp() {
+		return createTimestamp("Time step " + timestamps.size());
+	}
+	
+	public Timestamp createTimestamp(String name) {
+		Timestamp timestamp = new Timestamp(name);
+		timestamps.add(timestamp);
+		currentTime = timestamps.size()-1;
+		return timestamp;
+	}
+
+	public void deleteTimestamp(Timestamp toRemove) {
+		if (timestamps.size() > 1) {
+			if (toRemove == timestamps.get(currentTime) && currentTime > 0)
+				currentTime -= 1;
+			timestamps.remove(toRemove);
+		}
+	}
+	
+	public List<Timestamp> getTimestamps() {
+		return timestamps;
+	}
+
+	public int getCurrentTimestampIndex() {
+		return currentTime;
+	}
+
+	public void makeCurrentTimestamp(Timestamp timestamp) {
+		int i = timestamps.indexOf(timestamp);
+			currentTime = i;
+	}
+
 	public void nextTimestamp() {
 		currentTime++;
 		if (currentTime == timestamps.size()) {
-			createTimestamp("Time step " + (timestamps.size()));
+			createTimestamp();
 		}
 	}
 
 	public void prevTimestamp() {
 		currentTime--;
 		if (currentTime < 0) {
-			Timestamp ts = createTimestamp("Time step " + (timestamps.size()));
+			Timestamp ts = createTimestamp();
 			timestamps.remove(timestamps.size()-1);
 			timestamps.add(0, ts);
 			currentTime = 0;
 		}
 		
 	}
+
+	
+	
 }

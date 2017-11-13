@@ -18,11 +18,12 @@ import javax.swing.JPanel;
 import backend.Backend;
 import gui.categories.Category;
 import gui.categories.InputReturnCode;
+import gui.graph.Timestamp;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class CategoryPanel extends JPanel implements GuiPanel {
-	private static final Color bkgColor = new Color(0.8f, 0.8f, 1.0f);  
+public class TimestampPanel extends JPanel implements GuiPanel {
+	private static final Color bkgColor = new Color(0.8f, 1.0f, 0.8f);  
 	public static final double DOUBLE_CLICK_TIME_MILLIS = 500; 
 	
 	private Backend backend;
@@ -30,16 +31,16 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 	
 	private boolean editing;
 	private boolean dragging;
-	private Category selectedCategory;
+	private Timestamp selectedTimestamp;
 
 	private long lastLeftClickTime;
 	private long lastRightClickTime;
 	
-	public CategoryPanel(Backend backend) {		
+	public TimestampPanel(Backend backend) {		
 		this.backend = backend;
 
-		setMinimumSize(new Dimension(160, 0));
-		setPreferredSize(new Dimension(160, 0));
+		setMinimumSize(new Dimension(0, 48));
+		setPreferredSize(new Dimension(0, 48));
 		
 		setBorder(BorderFactory.createEtchedBorder());
 		
@@ -54,12 +55,12 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 	public void setSiblingComponent(GuiPanelGroup siblings) {
 		this.siblings = siblings;
 	}
-
-	private void unselectCategory() {
-		if (selectedCategory != null) {
-			selectedCategory.setSelected(false);
-			selectedCategory.setEditing(false);
-			selectedCategory = null;
+	
+	private void unselectTimestamp() {
+		if (selectedTimestamp != null) {
+			selectedTimestamp.setSelected(false);
+			selectedTimestamp.setEditing(false);
+			selectedTimestamp = null;
 		}
 	}
 	
@@ -71,18 +72,15 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 		g2d.setColor(bkgColor);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 
-		List<Category> categories = backend.getCategories();
-		for (int i = 0; i < categories.size(); i++) {
-			categories.get(i).draw(g2d);
-			if (categories.get(i) == backend.getDefaultCategory()) {
-				//g2d.setStroke(dashed_thin);
-				g2d.setColor(categories.get(i).getColor().darker());
-				//g2d.drawRect(2, 1, Category.WIDTH-5, Category.HEIGHT-4);
+		List<Timestamp> timestamps = backend.getTimestamps();
+		for (int i = 0; i < timestamps.size(); i++) {
+			timestamps.get(i).draw(g2d);
+			if (i == backend.getCurrentTimestampIndex()) {
+				g2d.setColor(timestamps.get(i).getColor().darker());
 				g2d.fillRect(1, 1, 8, 8);
-				//g2d.setStroke(original);
 			}
 
-			g2d.translate(0, Category.HEIGHT);
+			g2d.translate(Timestamp.WIDTH,0);
 		}
 
 		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
@@ -95,27 +93,27 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
 		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
 
-		g2d.translate(0, -Category.HEIGHT * categories.size());
+		g2d.translate(0, -Category.HEIGHT * timestamps.size());
 	}
 
 	@Override
 	public void unfocus() {
-		if (selectedCategory != null) {
-			unselectCategory();
+		if (selectedTimestamp != null) {
+			unselectTimestamp();
 			editing = false;
 			repaint();
 		}
 	}
 	
-	private Pair<Category, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
-		List<Category> categories = backend.getCategories();
-		for (int i = 0; i < categories.size(); i++) {
-			InputReturnCode rc = categories.get(i).mouseInput(x, y, performAction);
-			y -= Category.HEIGHT;
+	private Pair<Timestamp, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
+		List<Timestamp> timestamps = backend.getTimestamps();
+		for (int i = 0; i < timestamps.size(); i++) {
+			InputReturnCode rc = timestamps.get(i).mouseInput(x, y, performAction);
+			x -= Timestamp.WIDTH;
 			if (rc != InputReturnCode.miss)
-				return new Pair<Category, InputReturnCode>(categories.get(i), rc);
+				return new Pair<Timestamp, InputReturnCode>(timestamps.get(i), rc);
 		}
-		return new Pair<Category, InputReturnCode>(null, InputReturnCode.miss);
+		return new Pair<Timestamp, InputReturnCode>(null, InputReturnCode.miss);
 	}
 	
 	private class MouseListener extends MouseAdapter {
@@ -130,11 +128,11 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 	
 				editing = false;
 				//Select category
-				Pair<Category, InputReturnCode> ret = mouseInput(x, y, true);
+				Pair<Timestamp, InputReturnCode> ret = mouseInput(x, y, true);
 
 				if (ret.second() == InputReturnCode.hit) {
-					unselectCategory();
-					selectedCategory = ret.first();
+					unselectTimestamp();
+					selectedTimestamp = ret.first();
 				}
 				else if (ret.second() != InputReturnCode.miss) {
 					repaint();
@@ -142,26 +140,29 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 					return;
 				}
 				else
-					unselectCategory();
+					unselectTimestamp();
 				
-				//Create new category
-				y -= Category.HEIGHT * backend.getCategories().size();
+				//Create new timestamp
+				x -= Timestamp.WIDTH * backend.getTimestamps().size();
 				if (x > 0 && y > 0 && x < Category.WIDTH && y < Category.HEIGHT) {
-					selectedCategory = backend.createCategory();
-					selectedCategory.setSelected(true);
-					selectedCategory.setColor(Color.getHSBColor((float)Math.random(), 0.5f, 1f));
-					selectedCategory.setEditing(true);
+					selectedTimestamp = backend.createTimestamp();
+					selectedTimestamp.setSelected(true);
+					selectedTimestamp.setColor(Color.getHSBColor((float)Math.random(), 0.5f, 1f));
+					selectedTimestamp.setEditing(true);
 					editing = true;
+					
+					backend.makeCurrentTimestamp(selectedTimestamp);
+					siblings.repaint();
 				}
 				
-				if (selectedCategory != null) {
+				if (selectedTimestamp != null) {
 					dragging = true;
 				}
 				
 				//Edit if double click
-				if ((selectedCategory != null)) {
+				if ((selectedTimestamp != null)) {
 					if (System.currentTimeMillis() - lastLeftClickTime < DOUBLE_CLICK_TIME_MILLIS) {
-						selectedCategory.setEditing(true);
+						selectedTimestamp.setEditing(true);
 						editing = true;
 					}
 					lastLeftClickTime = System.currentTimeMillis();
@@ -173,15 +174,13 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 				repaint();
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3) {
-				Pair<Category, InputReturnCode> ret = mouseInput(x, y, false);
+				Pair<Timestamp, InputReturnCode> ret = mouseInput(x, y, false);
 				
-				if (ret.first() != null) {
-					siblings.performAction(SiblingActions.setCategory, ret.first());
-					siblings.repaint();
-					
+				if (ret.first() != null) {					
 					//Set default if double click
 					if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS) {
-						backend.setDefautCategory(ret.first());
+						backend.makeCurrentTimestamp(ret.first());
+						siblings.repaint();
 						repaint();
 					}
 					lastRightClickTime = System.currentTimeMillis();
@@ -201,7 +200,7 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			if (editing) {
-				selectedCategory.keyTyped(e.getKeyChar());
+				selectedTimestamp.keyTyped(e.getKeyChar());
 				repaint();
 			}
 		}
@@ -211,9 +210,9 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 			boolean repaint = false;
 			
 			if (!editing && e.getKeyCode() == KeyEvent.VK_DELETE) {
-				if (selectedCategory != null) {
-					backend.deleteCategory(selectedCategory);
-					selectedCategory = null;
+				if (selectedTimestamp != null) {
+					backend.deleteTimestamp(selectedTimestamp);
+					selectedTimestamp = null;
 					repaint = true;
 					siblings.repaint();
 				}
@@ -222,12 +221,12 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 			if (editing && (e.getKeyCode() == KeyEvent.VK_ESCAPE || 
 					e.getKeyCode() == KeyEvent.VK_ENTER)) {
 				editing = false;
-				selectedCategory.setEditing(false);
+				selectedTimestamp.setEditing(false);
 				repaint = true;
 			}
 				
-			if (selectedCategory != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-				unselectCategory();
+			if (selectedTimestamp != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				unselectTimestamp();
 				repaint = true;
 			}
 			
