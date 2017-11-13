@@ -1,100 +1,86 @@
 package gui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
 import backend.Backend;
 import gui.categories.Category;
+import gui.categories.GuiButtonObject;
 import gui.categories.InputReturnCode;
 import gui.graph.Timestamp;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class TimestampPanel extends JPanel implements GuiPanel {
-	private static final Color bkgColor = new Color(0.8f, 1.0f, 0.8f);  
-	public static final double DOUBLE_CLICK_TIME_MILLIS = 500; 
-	
-	private Backend backend;
-	private GuiPanelGroup siblings;
-	
-	private boolean editing;
-	private boolean dragging;
+public class TimestampPanel extends ContentListPanel {
 	private Timestamp selectedTimestamp;
-
-	private long lastLeftClickTime;
-	private long lastRightClickTime;
 	
-	public TimestampPanel(Backend backend) {		
-		this.backend = backend;
+	public TimestampPanel(Backend backend) {	
+		super(backend);
+		this.bkgColor = new Color(0.8f, 1.0f, 0.8f);
 
 		setMinimumSize(new Dimension(0, 48));
 		setPreferredSize(new Dimension(0, 48));
 		
-		setBorder(BorderFactory.createEtchedBorder());
-		
 		MouseListener ml = new MouseListener();
 		addMouseListener(ml);
+		
+		dw = Timestamp.WIDTH;
 	}
 
 	public void registerKeyListener() {
 		getTopLevelAncestor().addKeyListener(new KeyListener());
 	}
 	
-	public void setSiblingComponent(GuiPanelGroup siblings) {
-		this.siblings = siblings;
-	}
-	
-	private void unselectTimestamp() {
+	private void unselectTimestamp() { //TODO
 		if (selectedTimestamp != null) {
 			selectedTimestamp.setSelected(false);
 			selectedTimestamp.setEditing(false);
 			selectedTimestamp = null;
 		}
 	}
-	
+
 	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D g2d = (Graphics2D)g; 
-		
-		g2d.setColor(bkgColor);
-		g2d.fillRect(0, 0, getWidth(), getHeight());
-
-		List<Timestamp> timestamps = backend.getTimestamps();
-		for (int i = 0; i < timestamps.size(); i++) {
-			timestamps.get(i).draw(g2d);
-			if (i == backend.getCurrentTimestampIndex()) {
-				g2d.setColor(timestamps.get(i).getColor().darker());
-				g2d.fillRect(1, 1, 8, 8);
-			}
-
-			g2d.translate(Timestamp.WIDTH,0);
-		}
-
-		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
-		Stroke original = g2d.getStroke();
-		
-		g2d.setStroke(dashed);
-		g2d.setColor(bkgColor.darker());
-		g2d.drawRect(2, 0, Category.WIDTH-4, Category.HEIGHT-4);
-		g2d.setStroke(original);
-		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
-		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
-
-		g2d.translate(0, -Category.HEIGHT * timestamps.size());
+	protected List<? extends GuiButtonObject> componentsToDraw() {
+		return backend.getTimestamps();
 	}
+//	@Override
+//	protected void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		Graphics2D g2d = (Graphics2D)g; 
+//		
+//		g2d.setColor(bkgColor);
+//		g2d.fillRect(0, 0, getWidth(), getHeight());
+//
+//		List<Timestamp> timestamps = backend.getTimestamps();
+//		for (int i = 0; i < timestamps.size(); i++) {
+//			timestamps.get(i).draw(g2d);
+//			if (i == backend.getCurrentTimestampIndex()) {
+//				g2d.setColor(timestamps.get(i).getColor().darker());
+//				g2d.fillRect(1, 1, 8, 8);
+//			}
+//
+//			g2d.translate(Timestamp.WIDTH,0);
+//		}
+//
+//		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
+//		Stroke original = g2d.getStroke();
+//		
+//		g2d.setStroke(dashed);
+//		g2d.setColor(bkgColor.darker());
+//		g2d.drawRect(2, 0, Category.WIDTH-4, Category.HEIGHT-4);
+//		g2d.setStroke(original);
+//		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
+//		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
+//
+//		g2d.translate(0, -Category.HEIGHT * timestamps.size());
+//	}
+	
+	
 
 	@Override
 	public void unfocus() {
@@ -233,10 +219,5 @@ public class TimestampPanel extends JPanel implements GuiPanel {
 			if (repaint)
 				repaint();
 		}
-	}
-
-	@Override
-	public void performAction(SiblingActions actionCode, Object... params) {
-		
 	}
 }

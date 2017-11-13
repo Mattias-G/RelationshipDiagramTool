@@ -1,61 +1,41 @@
 package gui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
 import backend.Backend;
 import gui.categories.Category;
+import gui.categories.GuiButtonObject;
 import gui.categories.InputReturnCode;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class CategoryPanel extends JPanel implements GuiPanel {
-	private static final Color bkgColor = new Color(0.8f, 0.8f, 1.0f);  
-	public static final double DOUBLE_CLICK_TIME_MILLIS = 500; 
-	
-	private Backend backend;
-	private GuiPanelGroup siblings;
-	
-	private boolean editing;
-	private boolean dragging;
+public class CategoryPanel extends ContentListPanel { //FIXME add back scroll pane code
 	private Category selectedCategory;
-
-	private long lastLeftClickTime;
-	private long lastRightClickTime;
 	
 	public CategoryPanel(Backend backend) {		
-		this.backend = backend;
+		super(backend);
+		this.bkgColor = new Color(0.8f, 0.8f, 1.0f);
 
 		setMinimumSize(new Dimension(160, 48));
 		setPreferredSize(new Dimension(160, 48));
 		
-		setBorder(BorderFactory.createEtchedBorder());
-		
 		MouseListener ml = new MouseListener();
 		addMouseListener(ml);
+
+		dh = Category.HEIGHT;
 	}
 
 	public void registerKeyListener() {
 		getTopLevelAncestor().addKeyListener(new KeyListener());
 	}
-	
-	public void setSiblingComponent(GuiPanelGroup siblings) {
-		this.siblings = siblings;
-	}
 
-	private void unselectCategory() {
+	private void unselectCategory() { //TODO
 		if (selectedCategory != null) {
 			selectedCategory.setSelected(false);
 			selectedCategory.setEditing(false);
@@ -82,41 +62,45 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 		return getPreferredSize();
 	}
 
-	
 	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D g2d = (Graphics2D)g; 
-		
-		g2d.setColor(bkgColor);
-		g2d.fillRect(0, 0, getWidth(), getHeight());
-
-		List<Category> categories = backend.getCategories();
-		for (int i = 0; i < categories.size(); i++) {
-			categories.get(i).draw(g2d);
-			if (categories.get(i) == backend.getDefaultCategory()) {
-				//g2d.setStroke(dashed_thin);
-				g2d.setColor(categories.get(i).getColor().darker());
-				//g2d.drawRect(2, 1, Category.WIDTH-5, Category.HEIGHT-4);
-				g2d.fillRect(1, 1, 8, 8);
-				//g2d.setStroke(original);
-			}
-
-			g2d.translate(0, Category.HEIGHT);
-		}
-
-		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
-		Stroke original = g2d.getStroke();
-		
-		g2d.setStroke(dashed);
-		g2d.setColor(bkgColor.darker());
-		g2d.drawRect(2, 0, Category.WIDTH-4, Category.HEIGHT-4);
-		g2d.setStroke(original);
-		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
-		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
-
-		g2d.translate(0, -Category.HEIGHT * categories.size());
+	protected List<? extends GuiButtonObject> componentsToDraw() {
+		return backend.getCategories();
 	}
+	
+//	@Override
+//	protected void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		Graphics2D g2d = (Graphics2D)g; 
+//		
+//		g2d.setColor(bkgColor);
+//		g2d.fillRect(0, 0, getWidth(), getHeight());
+//
+//		List<Category> categories = backend.getCategories();
+//		for (int i = 0; i < categories.size(); i++) {
+//			categories.get(i).draw(g2d);
+//			if (categories.get(i) == backend.getDefaultCategory()) {
+//				//g2d.setStroke(dashed_thin);
+//				g2d.setColor(categories.get(i).getColor().darker());
+//				//g2d.drawRect(2, 1, Category.WIDTH-5, Category.HEIGHT-4);
+//				g2d.fillRect(1, 1, 8, 8);
+//				//g2d.setStroke(original);
+//			}
+//
+//			g2d.translate(0, Category.HEIGHT);
+//		}
+//
+//		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
+//		Stroke original = g2d.getStroke();
+//		
+//		g2d.setStroke(dashed);
+//		g2d.setColor(bkgColor.darker());
+//		g2d.drawRect(2, 0, Category.WIDTH-4, Category.HEIGHT-4);
+//		g2d.setStroke(original);
+//		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
+//		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
+//
+//		g2d.translate(0, -Category.HEIGHT * categories.size());
+//	}
 
 	@Override
 	public void unfocus() {
@@ -255,10 +239,5 @@ public class CategoryPanel extends JPanel implements GuiPanel {
 			if (repaint)
 				repaint();
 		}
-	}
-
-	@Override
-	public void performAction(SiblingActions actionCode, Object... params) {
-		
 	}
 }
