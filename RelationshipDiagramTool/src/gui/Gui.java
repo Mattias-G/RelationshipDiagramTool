@@ -33,7 +33,7 @@ public class Gui extends JFrame {
 
 	private void addMenuBar(Backend backend, GraphPanel graphPanel, CategoryPanel categoryPanel) {
 		SaveStateHandler saver = new SaveStateHandler(backend);
-		JMenuBar menuBar = new MenuBar(saver, graphPanel, categoryPanel);  
+		JMenuBar menuBar = new MenuBar(saver, graphPanel, categoryPanel);
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 
@@ -77,7 +77,7 @@ public class Gui extends JFrame {
 		gbc.weighty = 1;
 		
 		JScrollPane sp = new JScrollPane(categoryPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-		    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 				
 		add(sp, gbc);
 		categoryPanel.registerKeyListener();
