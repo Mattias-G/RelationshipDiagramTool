@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import backend.Backend;
 import gui.categories.Category;
 import gui.categories.GuiButtonObject;
-import gui.graph.Timestamp;
 
 @SuppressWarnings("serial")
 public abstract class ContentListPanel extends JPanel implements GuiPanel {

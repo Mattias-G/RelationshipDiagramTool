@@ -48,42 +48,10 @@ public class TimestampPanel extends ContentListPanel {
 	protected List<? extends GuiButtonObject> componentsToDraw() {
 		return backend.getTimestamps();
 	}
-//	@Override
-//	protected void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		Graphics2D g2d = (Graphics2D)g; 
-//		
-//		g2d.setColor(bkgColor);
-//		g2d.fillRect(0, 0, getWidth(), getHeight());
-//
-//		List<Timestamp> timestamps = backend.getTimestamps();
-//		for (int i = 0; i < timestamps.size(); i++) {
-//			timestamps.get(i).draw(g2d);
-//			if (i == backend.getCurrentTimestampIndex()) {
-//				g2d.setColor(timestamps.get(i).getColor().darker());
-//				g2d.fillRect(1, 1, 8, 8);
-//			}
-//
-//			g2d.translate(Timestamp.WIDTH,0);
-//		}
-//
-//		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
-//		Stroke original = g2d.getStroke();
-//		
-//		g2d.setStroke(dashed);
-//		g2d.setColor(bkgColor.darker());
-//		g2d.drawRect(2, 0, Category.WIDTH-4, Category.HEIGHT-4);
-//		g2d.setStroke(original);
-//		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
-//		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
-//
-//		g2d.translate(0, -Category.HEIGHT * timestamps.size());
-//	}
-	
 	
 
 	@Override
-	public void unfocus() {
+	public void unfocus() { //TODO
 		if (selectedTimestamp != null) {
 			unselectTimestamp();
 			editing = false;

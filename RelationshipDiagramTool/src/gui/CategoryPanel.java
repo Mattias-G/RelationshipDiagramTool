@@ -2,11 +2,14 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+
+import javax.swing.Scrollable;
 
 import backend.Backend;
 import gui.categories.Category;
@@ -15,7 +18,7 @@ import gui.categories.InputReturnCode;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class CategoryPanel extends ContentListPanel { //FIXME add back scroll pane code
+public class CategoryPanel extends ContentListPanel implements Scrollable {
 	private Category selectedCategory;
 	
 	public CategoryPanel(Backend backend) {		
@@ -66,44 +69,9 @@ public class CategoryPanel extends ContentListPanel { //FIXME add back scroll pa
 	protected List<? extends GuiButtonObject> componentsToDraw() {
 		return backend.getCategories();
 	}
-	
-//	@Override
-//	protected void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		Graphics2D g2d = (Graphics2D)g; 
-//		
-//		g2d.setColor(bkgColor);
-//		g2d.fillRect(0, 0, getWidth(), getHeight());
-//
-//		List<Category> categories = backend.getCategories();
-//		for (int i = 0; i < categories.size(); i++) {
-//			categories.get(i).draw(g2d);
-//			if (categories.get(i) == backend.getDefaultCategory()) {
-//				//g2d.setStroke(dashed_thin);
-//				g2d.setColor(categories.get(i).getColor().darker());
-//				//g2d.drawRect(2, 1, Category.WIDTH-5, Category.HEIGHT-4);
-//				g2d.fillRect(1, 1, 8, 8);
-//				//g2d.setStroke(original);
-//			}
-//
-//			g2d.translate(0, Category.HEIGHT);
-//		}
-//
-//		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
-//		Stroke original = g2d.getStroke();
-//		
-//		g2d.setStroke(dashed);
-//		g2d.setColor(bkgColor.darker());
-//		g2d.drawRect(2, 0, Category.WIDTH-4, Category.HEIGHT-4);
-//		g2d.setStroke(original);
-//		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
-//		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
-//
-//		g2d.translate(0, -Category.HEIGHT * categories.size());
-//	}
 
 	@Override
-	public void unfocus() {
+	public void unfocus() { //TODO
 		if (selectedCategory != null) {
 			unselectCategory();
 			editing = false;
@@ -156,6 +124,8 @@ public class CategoryPanel extends ContentListPanel { //FIXME add back scroll pa
 					selectedCategory.setColor(Color.getHSBColor((float)Math.random(), 0.5f, 1f));
 					selectedCategory.setEditing(true);
 					editing = true;
+
+          getParent().revalidate();
 				}
 				
 				if (selectedCategory != null) {
@@ -240,4 +210,34 @@ public class CategoryPanel extends ContentListPanel { //FIXME add back scroll pa
 				repaint();
 		}
 	}
+
+  @Override
+  public Dimension getPreferredScrollableViewportSize()
+  {
+    return getPreferredSize();
+  }
+
+  @Override
+  public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
+  {
+    return Category.HEIGHT / 2;
+  }
+
+  @Override
+  public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
+  {
+    return Category.HEIGHT / 2;
+  }
+
+  @Override
+  public boolean getScrollableTracksViewportWidth()
+  {
+    return false;
+  }
+
+  @Override
+  public boolean getScrollableTracksViewportHeight()
+  {
+    return false;
+  }
 }
