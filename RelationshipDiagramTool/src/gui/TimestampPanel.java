@@ -28,8 +28,10 @@ public class TimestampPanel extends ContentListPanel {
 		
 		MouseListener ml = new MouseListener();
 		addMouseListener(ml);
-		
-		dw = Timestamp.WIDTH;
+
+    dh = Timestamp.HEIGHT;
+    dw = Timestamp.WIDTH;
+    expandVertically = false;
 	}
 
 	public void registerKeyListener() {
@@ -107,6 +109,7 @@ public class TimestampPanel extends ContentListPanel {
 					
 					backend.makeCurrentTimestamp(selectedTimestamp);
 					siblings.repaint();
+          getParent().revalidate();
 				}
 				
 				if (selectedTimestamp != null) {
@@ -169,6 +172,7 @@ public class TimestampPanel extends ContentListPanel {
 					selectedTimestamp = null;
 					repaint = true;
 					siblings.repaint();
+          getParent().revalidate();
 				}
 			}
 			

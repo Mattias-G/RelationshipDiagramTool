@@ -45,8 +45,7 @@ public class MenuBar extends JMenuBar {
 		fileMenu.add(saveAsItem);
 		add(fileMenu);
 	}
-	
-	
+		
 	private class Listener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {

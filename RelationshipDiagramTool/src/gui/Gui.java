@@ -29,6 +29,8 @@ public class Gui extends JFrame {
 		tp.setSiblingComponent(new GuiPanelGroup(gp));
 		
 		setVisible(true);
+		
+		//FIXME: set minimum size of panes and menu bar to initial size!
 	}
 
 	private void addMenuBar(Backend backend, GraphPanel graphPanel, CategoryPanel categoryPanel) {
@@ -94,8 +96,11 @@ public class Gui extends JFrame {
 		gbc.gridheight = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1;
-		
-		add(timestampPanel, gbc);
+
+    JScrollPane sp = new JScrollPane(timestampPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    
+		add(sp, gbc);
 		timestampPanel.registerKeyListener();
 		return timestampPanel;
 	}

@@ -31,7 +31,9 @@ public class CategoryPanel extends ContentListPanel implements Scrollable {
 		MouseListener ml = new MouseListener();
 		addMouseListener(ml);
 
-		dh = Category.HEIGHT;
+    dh = Category.HEIGHT;
+    dw = Category.WIDTH;
+		expandVertically = true;
 	}
 
 	public void registerKeyListener() {
@@ -46,25 +48,6 @@ public class CategoryPanel extends ContentListPanel implements Scrollable {
 		}
 	}
 		
-	@Override
-	public Dimension getPreferredSize()
-	{
-		int h1 = getParent().getHeight();
-		int h2 = Category.HEIGHT * (backend.getCategories().size()+1);
-		int w = Category.WIDTH;
-		if (h2 > h1) {
-			w += 16;
-		}
-		
-		return new Dimension(w, Math.max(h1, h2));
-	}
-	
-	@Override
-	public Dimension getMinimumSize()
-	{
-		return getPreferredSize();
-	}
-
 	@Override
 	protected List<? extends GuiButtonObject> componentsToDraw() {
 		return backend.getCategories();

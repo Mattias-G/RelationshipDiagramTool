@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -18,6 +19,7 @@ import gui.categories.GuiButtonObject;
 public abstract class ContentListPanel extends JPanel implements GuiPanel {
 	public static final double DOUBLE_CLICK_TIME_MILLIS = 500;
 	protected Color bkgColor;
+	protected boolean expandVertically;
 	
 	protected Backend backend;
 	protected GuiPanelGroup siblings;
@@ -41,6 +43,34 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel {
 	}
 	
 	@Override
+  public Dimension getPreferredSize()
+  {
+    if (expandVertically) {
+  	  int h1 = getParent().getHeight();
+      int h2 = dh * (backend.getCategories().size()+1);
+      int w = dw;
+      if (h2 > h1) {
+        w += 16;
+      }
+      return new Dimension(w, Math.max(h1, h2));
+    }
+    
+    int h = dh;
+    int w1 = getParent().getWidth();
+    int w2 = dw * (backend.getTimestamps().size()+1);
+    if (w2 > w1) {
+      h += 16;
+    }
+    return new Dimension(Math.max(w1, w2), h);
+  }
+  
+  @Override
+  public Dimension getMinimumSize()
+  {
+    return getPreferredSize();
+  }
+	
+	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D)g; 
@@ -56,7 +86,10 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel {
 				g2d.fillRect(1, 1, 8, 8);
 			}
 
-			g2d.translate(dw,dh);
+			if (expandVertically)
+			  g2d.translate(0,dh);
+			else
+        g2d.translate(dw,0);
 		}
 
 		Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[]{3}, 0);
@@ -69,7 +102,10 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel {
 		g2d.fillRect(Category.WIDTH/2-Category.HEIGHT/6, Category.HEIGHT/2-1, Category.HEIGHT/3, 2);
 		g2d.fillRect(Category.WIDTH/2-1, Category.HEIGHT/3, 2, Category.HEIGHT/3);
 
-		g2d.translate(-dw * content.size(), -dh * content.size());
+    if (expandVertically)
+      g2d.translate(0, -dh * content.size());
+    else
+      g2d.translate(-dw * content.size(), 0);
 	}
 
 	protected abstract List<? extends GuiButtonObject> componentsToDraw();
