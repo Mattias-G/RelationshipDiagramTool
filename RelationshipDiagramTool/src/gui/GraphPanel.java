@@ -209,8 +209,12 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	}
 	
 	private void leftClickOnNode(Node node, MouseEvent e) {
-		if (e.isShiftDown())
+		// select
+		if (e.isShiftDown()) {
+			if (selectedNode != null)
+				selectedNode.isEditing = false;
 			addNodeToSelection(node);
+		}
 		else {
 			selectNode(node);
 			dragging = true;
@@ -218,14 +222,20 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	}
 
 	private void rightClickOnNode(Node node, MouseEvent e) {
-		if (e.isShiftDown())
+		// select + draw edge
+		if (e.isShiftDown()) {
+			if (selectedNode != null)
+				selectedNode.isEditing = false;
 			addNodeToSelection(node);
+		}
 		else {
 			selectNode(node);
+			creatingEdge = true;
 		}
 	}
 
 	private void leftClickOnEdge(Edge edge, MouseEvent e) {
+		// select
 		if (!e.isShiftDown()) {
 			unselectArea();
 			edge.setSelected(true);
@@ -234,6 +244,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	}
 
 	private void rightClickOnEdge(Edge edge, MouseEvent e) {
+		// select
 		if (!e.isShiftDown()) {
 			unselectArea();
 			edge.setSelected(true);
@@ -242,33 +253,67 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	}
 
 	private void leftClickOnEmpty(int x, int y, MouseEvent e) {
-		if (e.isShiftDown()) {
-			areaSelecting = true;
-			selectionOriginPointX = x;
-			selectionOriginPointY = y;
-		}
-		else {
+		// select area
+		if (selectedNode != null)
+			selectedNode.isEditing = false;
+		if (!e.isShiftDown())
 			unselectArea();
-		}
+		areaSelecting = true;
+		selectionOriginPointX = x;
+		selectionOriginPointY = y;
 	}
 
 	private void rightClickOnEmpty(int x, int y, MouseEvent e) {
 		if (!e.isShiftDown())
 			unselectArea();
 	}
+	
+	private void leftDoubleClickOnNode(Node node, MouseEvent e) {
+		// rename
+		if (!e.isShiftDown()) {
+			unselectArea();
+			node.setSelected(true);
+			node.setEditing(true);
+			editing = true;
+		}
+	}
 
-//	doubleClickOnNode();
-//	doubleClickOnEdge();
-//	doubleClickOnEmpty();
+	private void rightDoubleClickOnNode(Node node, MouseEvent e) {
+		// do nothing
+	}
+
+	private void leftDoubleClickOnEdge(Edge edge, MouseEvent e) {
+		// rename
+		if (!e.isShiftDown()) {
+			edge.setEditing(true);
+			editing = true;
+		}
+	}
+
+	private void rightDoubleClickOnEdge(Edge edge, MouseEvent e) {
+		// do nothing
+	}
+
+	private void leftDoubleClickOnEmpty(int x, int y, MouseEvent e) {
+		// do nothing
+	}
+
+	private void rightDoubleClickOnEmpty(int x, int y, MouseEvent e) {
+		// create new
+		if (!e.isShiftDown()) {
+			selectedNode = backend.createNode(x, y);
+			selectedNode.setSelected(true);
+			selectedNode.setEditing(true);
+			editing = true;
+		}
+	}
 	
 	private class MouseListener extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			siblings.unfocus();
-//			if (selectedNode != null && e.isShiftDown())
-//			  selectedNode.isEditing = false;
-			//TODO: clean up
-			if (selectedNode == null || !areaSelectedNodes.contains(selectedNode))
+			
+			if (!e.isShiftDown() && (selectedNode == null || !areaSelectedNodes.contains(selectedNode)))
 				unselectNode();
 			unselectEdge();
 			creatingEdge = false;
@@ -282,115 +327,69 @@ public class GraphPanel extends JPanel implements GuiPanel {
 			boolean doubleLeft = false;
 			boolean doubleRight = false;
 
-      Node node = backend.findNodeAtPoint(x, y);
-      Edge edge = backend.findEdgeAtPoint(x, y);
-      
-			//Select node
+			Node node = backend.findNodeAtPoint(x, y);
+			Edge edge = backend.findEdgeAtPoint(x, y);
+
+			// Select node
 			if (node != null) {
-			  if (isLeft)
-			    leftClickOnNode(node, e);
-			  else if (isRight)
-          rightClickOnNode(node, e);
+				if (isLeft)
+					leftClickOnNode(node, e);
+				else if (isRight)
+					rightClickOnNode(node, e);
 			}
-			//Select edge
+			// Select edge
 			else if (edge != null) {
-        if (isLeft)
-        	leftClickOnEdge(edge, e);
-        else if (isRight)
-        	rightClickOnEdge(edge, e);
+				if (isLeft)
+					leftClickOnEdge(edge, e);
+				else if (isRight)
+					rightClickOnEdge(edge, e);
 			}
-			//Select empty
+			// Select empty
 			else {
-			  if (isLeft)
-			  	leftClickOnEmpty(x, y, e);
-			  else if (isRight)
-			  	rightClickOnEmpty(x, y, e);
+				if (isLeft)
+					leftClickOnEmpty(x, y, e);
+				else if (isRight)
+					rightClickOnEmpty(x, y, e);
 			}
 			
-//			//Update double click
-//			if (isLeft) {
-//				if (selectedNode != null || selectedEdge != null)
-//					lastLeftClickTime = 0;
-//				else {
-//					if (System.currentTimeMillis() - lastLeftClickTime < DOUBLE_CLICK_TIME_MILLIS)
-//						doubleLeft = true;
-//					lastLeftClickTime = System.currentTimeMillis();
-//				}
-//			}
-//			else if (isRight) {
-//				if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS)
-//					doubleLeft = true;
-//				lastRightClickTime = System.currentTimeMillis();
-//			}
-			
-//			//Double click on node
-//			if (node != null) {
-//			  if (isLeft)
-//			    leftDoubleClickOnNode(node, e);
-//			  else if (isRight)
-//          rightDoubleClickOnNode(node, e);
-//			}
-//			//Double click on edge
-//			else if (edge != null) {
-//        if (isLeft)
-//        	leftDoubleClickOnEdge(edge, e);
-//        else if (isRight)
-//        	rightDoubleClickOnEdge(edge, e);
-//			}
-//			//Double click on empty
-//			else {
-//			  if (isLeft)
-//			  	leftDoubleClickOnEmpty(x, y, e);
-//			  else if (isRight)
-//			  	rightDoubleClickOnEmpty(x, y, e);
-//			}
-			
-			
-			
-			
-			
-			//Edit if double click
-			if ((selectedNode != null || selectedEdge != null) && 
-					e.getButton() == MouseEvent.BUTTON1) {
-				if (System.currentTimeMillis() - lastLeftClickTime < DOUBLE_CLICK_TIME_MILLIS) {
-					if (selectedNode != null) {
-						unselectArea();
-						selectedNode.setSelected(true);
-						selectedNode.setEditing(true);
-					}
-					else
-						selectedEdge.setEditing(true);
-					editing = true;
-				}
+			// Update double click
+			if (isLeft) {
+				if (System.currentTimeMillis() - lastLeftClickTime < DOUBLE_CLICK_TIME_MILLIS)
+					doubleLeft = true;
 				lastLeftClickTime = System.currentTimeMillis();
+			} 
+			else if (isRight) {
+				if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS)
+					doubleRight = true;
+				lastRightClickTime = System.currentTimeMillis();
 			}
-			//Create node if double right click
+			
+			// Double click on node
+			if (node != null) {
+				if (doubleLeft)
+					leftDoubleClickOnNode(node, e);
+				else if (doubleRight)
+					rightDoubleClickOnNode(node, e);
+			}
+			// Double click on edge
+			else if (edge != null) {
+				if (doubleLeft)
+					leftDoubleClickOnEdge(edge, e);
+				else if (doubleRight)
+					rightDoubleClickOnEdge(edge, e);
+			}
+			// Double click on empty
 			else {
-				lastLeftClickTime = 0;
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					if (selectedNode == null) {
-						if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS) {
-							selectedNode = backend.createNode(x, y);
-							selectedNode.setSelected(true);
-							selectedNode.setEditing(true);
-							editing = true;
-						}
-						lastRightClickTime = System.currentTimeMillis();
-					}
-					//Or create edge if dragging right button
-					else if (selectedNode != null) {
-						creatingEdge = true;
-					}
-				}
-				//Or pan if middle mouse button
-				else if (e.getButton() == MouseEvent.BUTTON2) {
-					panning = true;
-				}
-				else {
-					areaSelecting = true;
-					selectionOriginPointX = x;
-					selectionOriginPointY = y;
-				}
+				if (doubleLeft)
+					leftDoubleClickOnEmpty(x, y, e);
+				else if (doubleRight)
+					rightDoubleClickOnEmpty(x, y, e);
+			}
+			
+
+			//pan if middle mouse button
+			if (e.getButton() == MouseEvent.BUTTON2) {
+				panning = true;
 			}
 			
 			mouseX = e.getX();
@@ -433,7 +432,10 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				dx = Math.abs(dx);
 				dy = Math.abs(dy);
 				
-				selectNodesInArea(x0, y0, x0+dx, y0+dy);
+				if (e.isShiftDown())
+					addNodesInAreaToSelection(x0, y0, x0+dx, y0+dy);
+				else
+					selectNodesInArea(x0, y0, x0+dx, y0+dy);
 
 				areaSelecting = false;
 				repaint();
