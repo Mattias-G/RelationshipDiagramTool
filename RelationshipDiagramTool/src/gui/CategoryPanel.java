@@ -61,6 +61,12 @@ public class CategoryPanel extends ContentListPanel implements Scrollable {
 			repaint();
 		}
 	}
+
+  @Override
+  protected boolean squareMarked(int i)
+  {
+    return (backend.getCategories().get(i) == backend.getDefaultCategory());
+  }
 	
 	private Pair<Category, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
 		List<Category> categories = backend.getCategories();

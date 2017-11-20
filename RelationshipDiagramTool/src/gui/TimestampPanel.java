@@ -60,7 +60,13 @@ public class TimestampPanel extends ContentListPanel {
 			repaint();
 		}
 	}
-	
+
+  @Override
+  protected boolean squareMarked(int i)
+  {
+    return (i == backend.getCurrentTimestampIndex());
+  }
+  
 	private Pair<Timestamp, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
 		List<Timestamp> timestamps = backend.getTimestamps();
 		for (int i = 0; i < timestamps.size(); i++) {

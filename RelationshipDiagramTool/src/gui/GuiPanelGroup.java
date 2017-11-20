@@ -31,5 +31,12 @@ public class GuiPanelGroup {
 		}
 	}
 	
+	public boolean anyoneEditing() {
+    for (GuiPanel guiPanel : panels) {
+      if (guiPanel.isEditing())
+        return true;
+    }
+    return false;
+	}
 	
 }

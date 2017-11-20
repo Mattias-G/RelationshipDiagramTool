@@ -70,6 +70,12 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel {
     return getPreferredSize();
   }
 	
+  @Override
+  public boolean isEditing()
+  {
+    return editing;
+  }
+  
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -81,7 +87,7 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel {
 		List<? extends GuiButtonObject> content = componentsToDraw();
 		for (int i = 0; i < content.size(); i++) {
 			content.get(i).draw(g2d);
-			if (i == backend.getCurrentTimestampIndex()) {
+			if (squareMarked(i)) {
 				g2d.setColor(content.get(i).getColor().darker());
 				g2d.fillRect(1, 1, 8, 8);
 			}
@@ -108,7 +114,9 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel {
       g2d.translate(-dw * content.size(), 0);
 	}
 
-	protected abstract List<? extends GuiButtonObject> componentsToDraw();
+	protected abstract boolean squareMarked(int i);
+
+  protected abstract List<? extends GuiButtonObject> componentsToDraw();
 
 
 	@Override

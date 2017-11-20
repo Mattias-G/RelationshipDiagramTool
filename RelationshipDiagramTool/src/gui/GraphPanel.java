@@ -175,6 +175,11 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		}
 	}
 	
+	@Override
+	public boolean isEditing() {
+	  return editing;
+	}
+	
 	private class MouseListener extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
@@ -391,12 +396,12 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				}
 			}
 			
-			if (!editing && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) { //FIXME: should only work if not editing in other panels!
+			if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) { //FIXME: should only work if not editing in other panels!
 				backend.nextTimestamp();
 				repaint = true;
 				siblings.repaint();
 			}
-			if (!editing && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
+			if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
 				backend.prevTimestamp();
 				repaint = true;
 				siblings.repaint();
