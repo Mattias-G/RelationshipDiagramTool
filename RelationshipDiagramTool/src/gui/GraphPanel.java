@@ -91,6 +91,14 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		}
 	}
 
+  private void selectNode(Node node)
+  {
+    selectedNode = node;
+    if (!areaSelectedNodes.contains(node))
+      unselectArea();
+    node.setSelected(true);
+  }
+
 	private void selectNodesInArea(int x1, int y1, int x2, int y2) {
 		for (Node node : backend.getNodes()) {
 			if (node.isVisible() && node.coveredByArea(x1,y1,x2,y2)) {
@@ -99,6 +107,35 @@ public class GraphPanel extends JPanel implements GuiPanel {
 			}
 		}
 	}
+
+  private void addNodesInAreaToSelection(int x1, int y1, int x2, int y2) {
+    for (Node node : backend.getNodes()) {
+      if (node.isVisible() && node.coveredByArea(x1,y1,x2,y2)) {
+        addNodeToSelection(node);
+      }
+    }
+  }
+  
+  private void addNodeToSelection(Node node) {
+    if (areaSelectedNodes.isEmpty() && selectedNode != null) {
+      areaSelectedNodes.add(selectedNode);
+      selectedNode = null;
+    }
+      
+    if (!node.isSelected) {
+      areaSelectedNodes.add(node);
+      node.setSelected(true);
+    }
+  }
+
+  private void unselectArea() {
+    if (!areaSelectedNodes.isEmpty()) {
+      for (Node node : areaSelectedNodes) {
+        node.setSelected(false);
+      }
+      areaSelectedNodes.clear();
+    }
+  }
 	
 	private int transformedX(int x) {
 		int vx = (int)(getWidth()/2 * zoom - (getWidth()/2 - viewX));
@@ -166,19 +203,71 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		}
 	}
 	
-	private void unselectArea() {
-		if (!areaSelectedNodes.isEmpty()) {
-			for (Node node : areaSelectedNodes) {
-				node.setSelected(false);
-			}
-			areaSelectedNodes.clear();
+	@Override
+	public boolean isEditing() {
+		return editing;
+	}
+	
+	private void leftClickOnNode(Node node, MouseEvent e) {
+		if (e.isShiftDown())
+			addNodeToSelection(node);
+		else {
+			selectNode(node);
+			dragging = true;
 		}
 	}
+
+	private void rightClickOnNode(Node node, MouseEvent e) {
+		if (e.isShiftDown())
+			addNodeToSelection(node);
+		else {
+			selectNode(node);
+		}
+	}
+
+	private void leftClickOnEdge(Edge edge, MouseEvent e) {
+		if (!e.isShiftDown()) {
+			unselectArea();
+			edge.setSelected(true);
+			selectedEdge = edge;
+		}
+	}
+
+	private void rightClickOnEdge(Edge edge, MouseEvent e) {
+		if (!e.isShiftDown()) {
+			unselectArea();
+			edge.setSelected(true);
+			selectedEdge = edge;
+		}
+	}
+
+	private void leftClickOnEmpty(int x, int y, MouseEvent e) {
+		if (e.isShiftDown()) {
+			areaSelecting = true;
+			selectionOriginPointX = x;
+			selectionOriginPointY = y;
+		}
+		else {
+			unselectArea();
+		}
+	}
+
+	private void rightClickOnEmpty(int x, int y, MouseEvent e) {
+		if (!e.isShiftDown())
+			unselectArea();
+	}
+
+//	doubleClickOnNode();
+//	doubleClickOnEdge();
+//	doubleClickOnEmpty();
 	
 	private class MouseListener extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			siblings.unfocus();
+//			if (selectedNode != null && e.isShiftDown())
+//			  selectedNode.isEditing = false;
+			//TODO: clean up
 			if (selectedNode == null || !areaSelectedNodes.contains(selectedNode))
 				unselectNode();
 			unselectEdge();
@@ -187,27 +276,78 @@ public class GraphPanel extends JPanel implements GuiPanel {
 
 			int x = transformedX(e.getX());
 			int y = transformedY(e.getY());
-			//TODO: deal with this mess
+
+			boolean isLeft = e.getButton() == MouseEvent.BUTTON1;
+			boolean isRight = e.getButton() == MouseEvent.BUTTON3;
+			boolean doubleLeft = false;
+			boolean doubleRight = false;
+
+      Node node = backend.findNodeAtPoint(x, y);
+      Edge edge = backend.findEdgeAtPoint(x, y);
+      
 			//Select node
-			selectedNode = backend.findNodeAtPoint(x, y);
-			if (selectedNode != null) {
-				//Unselect area if not selected node
-				if (!areaSelectedNodes.contains(selectedNode))
-					unselectArea();
-				
-				selectedNode.setSelected(true);
-				if (e.getButton() == MouseEvent.BUTTON1)
-					dragging = true;
+			if (node != null) {
+			  if (isLeft)
+			    leftClickOnNode(node, e);
+			  else if (isRight)
+          rightClickOnNode(node, e);
 			}
+			//Select edge
+			else if (edge != null) {
+        if (isLeft)
+        	leftClickOnEdge(edge, e);
+        else if (isRight)
+        	rightClickOnEdge(edge, e);
+			}
+			//Select empty
 			else {
-				unselectArea();
-				selectedEdge = backend.findEdgeAtPoint(x, y);
-				if (selectedEdge != null) {
-					selectedEdge.setSelected(true);
-//					if (e.getButton() == MouseEvent.BUTTON1)
-//						dragging = true;
-				}
+			  if (isLeft)
+			  	leftClickOnEmpty(x, y, e);
+			  else if (isRight)
+			  	rightClickOnEmpty(x, y, e);
 			}
+			
+//			//Update double click
+//			if (isLeft) {
+//				if (selectedNode != null || selectedEdge != null)
+//					lastLeftClickTime = 0;
+//				else {
+//					if (System.currentTimeMillis() - lastLeftClickTime < DOUBLE_CLICK_TIME_MILLIS)
+//						doubleLeft = true;
+//					lastLeftClickTime = System.currentTimeMillis();
+//				}
+//			}
+//			else if (isRight) {
+//				if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS)
+//					doubleLeft = true;
+//				lastRightClickTime = System.currentTimeMillis();
+//			}
+			
+//			//Double click on node
+//			if (node != null) {
+//			  if (isLeft)
+//			    leftDoubleClickOnNode(node, e);
+//			  else if (isRight)
+//          rightDoubleClickOnNode(node, e);
+//			}
+//			//Double click on edge
+//			else if (edge != null) {
+//        if (isLeft)
+//        	leftDoubleClickOnEdge(edge, e);
+//        else if (isRight)
+//        	rightDoubleClickOnEdge(edge, e);
+//			}
+//			//Double click on empty
+//			else {
+//			  if (isLeft)
+//			  	leftDoubleClickOnEmpty(x, y, e);
+//			  else if (isRight)
+//			  	rightDoubleClickOnEmpty(x, y, e);
+//			}
+			
+			
+			
+			
 			
 			//Edit if double click
 			if ((selectedNode != null || selectedEdge != null) && 
@@ -261,7 +401,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 			panViewOriginPointY = viewY;
 			repaint();
 		}
-
+		
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			int x = transformedX(e.getX());
@@ -391,12 +531,12 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				}
 			}
 			
-			if (!editing && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) { //FIXME: should only work if not editing in other panels!
+			if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) { //FIXME: should only work if not editing in other panels!
 				backend.nextTimestamp();
 				repaint = true;
 				siblings.repaint();
 			}
-			if (!editing && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
+			if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
 				backend.prevTimestamp();
 				repaint = true;
 				siblings.repaint();

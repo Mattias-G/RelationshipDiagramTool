@@ -41,6 +41,12 @@ public class CategoryPanel extends ContentListPanel {
 	protected void deleteSelectedListObject() {
 		backend.deleteCategory((Category)selectedObject);
 	}
+
+  @Override
+  protected boolean squareMarked(int i)
+  {
+    return (backend.getCategories().get(i) == backend.getDefaultCategory());
+  }
 	
 	@Override
 	protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolean performAction) {

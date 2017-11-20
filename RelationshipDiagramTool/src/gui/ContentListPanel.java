@@ -140,13 +140,18 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 		if (w2 > w1) {
 			h += 15;
 		}
-		System.out.println(h);
 		
 		sp.setPreferredSize(new Dimension(dw, h));
 		sp.setMinimumSize(new Dimension(dw, h));
 		return (getHeight() != h);
 	}
 	
+  @Override
+  public boolean isEditing()
+  {
+    return editing;
+  }
+  
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -158,7 +163,7 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 		List<? extends GuiButtonObject> content = componentsToDraw();
 		for (int i = 0; i < content.size(); i++) {
 			content.get(i).draw(g2d);
-			if (i == backend.getCurrentTimestampIndex()) {
+			if (squareMarked(i)) {
 				g2d.setColor(content.get(i).getColor().darker());
 				g2d.fillRect(1, 1, 8, 8);
 			}
@@ -184,6 +189,8 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 	else
 		g2d.translate(-dw * content.size(), 0);
 	}
+
+	protected abstract boolean squareMarked(int i);
 
 	protected abstract List<? extends GuiButtonObject> componentsToDraw();
 

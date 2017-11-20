@@ -25,8 +25,8 @@ public class Gui extends JFrame {
 		TimestampPanel tp = addTimestampPanel(backend);
 		addMenuBar(backend, gp, cp);
 		gp.setSiblingComponent(new GuiPanelGroup(cp, tp));
-		cp.setSiblingComponent(new GuiPanelGroup(gp));
-		tp.setSiblingComponent(new GuiPanelGroup(gp));
+		cp.setSiblingComponent(new GuiPanelGroup(gp, tp));
+		tp.setSiblingComponent(new GuiPanelGroup(gp, cp));
 		
 		setVisible(true);
 		

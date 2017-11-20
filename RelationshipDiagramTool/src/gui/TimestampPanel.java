@@ -44,9 +44,14 @@ public class TimestampPanel extends ContentListPanel {
 	protected void deleteSelectedListObject() {
 		backend.deleteTimestamp((Timestamp)selectedObject);
 	}
-	
+
 	@Override
-	protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
+	protected boolean squareMarked(int i) {
+		return (i == backend.getCurrentTimestampIndex());
+	}
+  
+@Override
+protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
 		List<Timestamp> timestamps = backend.getTimestamps();
 		for (int i = 0; i < timestamps.size(); i++) {
 			InputReturnCode rc = timestamps.get(i).mouseInput(x, y, performAction);
