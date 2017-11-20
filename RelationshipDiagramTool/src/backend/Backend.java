@@ -411,7 +411,7 @@ public class Backend {
 
 	public void deleteTimestamp(Timestamp toRemove) {
 		if (timestamps.size() > 1) {
-			if (toRemove == timestamps.get(currentTime) && currentTime > 0)
+			if (timestamps.indexOf(toRemove) <= currentTime && currentTime > 0)
 				currentTime -= 1;
 			timestamps.remove(toRemove);
 		}

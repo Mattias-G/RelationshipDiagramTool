@@ -30,24 +30,12 @@ public class Gui extends JFrame {
 		
 		setVisible(true);
 		
-		//FIXME: set minimum size of panes and menu bar to initial size!
 	}
 
 	private void addMenuBar(Backend backend, GraphPanel graphPanel, CategoryPanel categoryPanel) {
 		SaveStateHandler saver = new SaveStateHandler(backend);
 		JMenuBar menuBar = new MenuBar(saver, graphPanel, categoryPanel);
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 2;
-		gbc.gridheight = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1;
-		gbc.weighty = 0;
-		
-		add(menuBar, gbc);
+		setJMenuBar(menuBar);
 	}
 	
 	private GraphPanel addGraphPanel(Backend backend) {
@@ -55,7 +43,7 @@ public class Gui extends JFrame {
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -68,39 +56,41 @@ public class Gui extends JFrame {
 	}
 
 	private CategoryPanel addCategoryPanel(Backend backend) {
-		CategoryPanel categoryPanel = new CategoryPanel(backend); 
+		CategoryPanel categoryPanel = new CategoryPanel(backend, this); 
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.gridx = 1;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 2;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.weighty = 1;
 		
 		JScrollPane sp = new JScrollPane(categoryPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 				
 		add(sp, gbc);
+		sp.setMinimumSize(new Dimension(categoryPanel.dw, categoryPanel.dh));
 		categoryPanel.registerKeyListener();
 		return categoryPanel;
 	}
 
 	private TimestampPanel addTimestampPanel(Backend backend) {
-		TimestampPanel timestampPanel = new TimestampPanel(backend); 
+		TimestampPanel timestampPanel = new TimestampPanel(backend, this); 
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1;
 
-    JScrollPane sp = new JScrollPane(timestampPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
-        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    
+		JScrollPane sp = new JScrollPane(timestampPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
 		add(sp, gbc);
+		sp.setMinimumSize(new Dimension(timestampPanel.dw, timestampPanel.dh));
 		timestampPanel.registerKeyListener();
 		return timestampPanel;
 	}
