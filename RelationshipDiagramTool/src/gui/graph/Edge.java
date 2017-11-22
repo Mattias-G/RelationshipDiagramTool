@@ -92,6 +92,10 @@ public class Edge extends GuiComponent {
 		return startNode.getCategory().isVisible() && endNode.getCategory().isVisible();
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	@Override
 	public String toString() {
 		return id + " " + startNode.getId() + " " + endNode.getId() + " " + name;

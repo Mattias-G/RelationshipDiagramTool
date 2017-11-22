@@ -64,12 +64,11 @@ protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolea
 
 	@Override
 	protected void onRightClick(GuiButtonObject target) {
-		//Set current if double click
-		if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS) {
+		//Set current
 			backend.makeCurrentTimestamp((Timestamp) target);
 			siblings.repaint();
+			siblings.unfocus();
 			repaint();
-		}
 	}
 
 }

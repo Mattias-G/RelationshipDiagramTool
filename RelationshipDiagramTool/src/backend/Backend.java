@@ -13,11 +13,14 @@ import gui.categories.Category;
 import gui.graph.Edge;
 import gui.graph.Node;
 import gui.graph.Timestamp;
+import utils.EdgeCopyConstruct;
 
 public class Backend {
 	private int idCounter;
 	private List<Category> categories = new ArrayList<>();
 	private List<Timestamp> timestamps = new ArrayList<>();
+	private List<Node> nodeClipboard = new ArrayList<>();
+	private List<EdgeCopyConstruct> edgeClipboard = new ArrayList<>();
 	
 	private Category defaultCategory;
 	private Category noCategory;
@@ -448,6 +451,40 @@ public class Backend {
 		
 	}
 
+	public void copyNodes(List<Node> nodes) {
+		nodeClipboard.clear();
+		edgeClipboard.clear();
+		
+		for (Node original : nodes) {
+			Node node = new Node(original, -1);
+			nodeClipboard.add(node);
+		}
+
+		for (Edge original : timestamps.get(currentTime).getEdges()) {
+			int i1 = nodes.indexOf(original.getStartNode());
+			int i2 = nodes.indexOf(original.getEndNode());
+			if (i1 >= 0 && i2 >= 0) {
+				EdgeCopyConstruct edge = new EdgeCopyConstruct(i1, i2, original.getName());
+				edgeClipboard.add(edge);
+			}
+		}
+	}
 	
+	public List<Node> pasteNodes() {
+		List<Node> list = new ArrayList<>(); 
+		for (Node original : nodeClipboard) {
+			Node node = new Node(original, idCounter++);
+			list.add(node);
+			timestamps.get(currentTime).addNode(node);
+		}
+		
+		for (EdgeCopyConstruct original : edgeClipboard) {
+			Edge edge = new Edge(list.get(original.nodeIndex1), list.get(original.nodeIndex2), idCounter++);
+			edge.setName(original.name);
+			timestamps.get(currentTime).addEdge(edge);
+		}
+		
+		return list;
+	}
 	
 }

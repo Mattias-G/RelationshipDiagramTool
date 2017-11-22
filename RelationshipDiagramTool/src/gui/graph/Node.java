@@ -27,6 +27,18 @@ public class Node extends GuiComponent {
 	}
 	
 	
+	public Node(Node original, int id) {
+		width = 64;
+		height = 32;
+		category = original.category;
+		x = original.x+16;
+		y = original.y+16;
+		name = original.name;
+		
+		this.id = id;
+	}
+
+
 	public void draw(Graphics2D g2d) {
 		if (isVisible()) {
 			if (font == null) {

@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -26,7 +27,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	
 	private Node selectedNode;
 	private Edge selectedEdge;
-	private ArrayList<Node> areaSelectedNodes = new ArrayList<>();
+	private List<Node> areaSelectedNodes = new ArrayList<>();
 	
 	private boolean dragging;
 	private boolean editing;
@@ -533,15 +534,51 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				}
 			}
 			
-			if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) { //FIXME: should only work if not editing in other panels!
-				backend.nextTimestamp();
-				repaint = true;
-				siblings.repaint();
-			}
-			if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
-				backend.prevTimestamp();
-				repaint = true;
-				siblings.repaint();
+			if (!editing && !siblings.anyoneEditing()) {
+				if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) {
+					backend.nextTimestamp();
+					repaint = true;
+					siblings.repaint();
+				}
+				if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
+					backend.prevTimestamp();
+					repaint = true;
+					siblings.repaint();
+				}
+
+
+				if (e.getKeyCode() == KeyEvent.VK_A && e.isControlDown()) {
+					unselectNode();
+					unselectEdge();
+					unselectArea();
+					areaSelectedNodes.addAll(backend.getNodes());
+					for (Node node : areaSelectedNodes) {
+						node.isSelected = true;
+					}
+					repaint = true;
+				}
+				
+				if (e.getKeyCode() == KeyEvent.VK_C && e.isControlDown()) {
+					if (!areaSelectedNodes.isEmpty()) {
+						backend.copyNodes(areaSelectedNodes);
+					}
+					else if (selectedNode != null) {
+						List<Node> nodes = new ArrayList<>();
+						nodes.add(selectedNode);
+						backend.copyNodes(nodes);
+					}
+				}
+
+				if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
+					unselectNode();
+					unselectEdge();
+					unselectArea();
+					areaSelectedNodes = backend.pasteNodes(); 
+					for (Node node : areaSelectedNodes) {
+						node.isSelected = true;
+					}
+					repaint = true;
+				}
 			}
 			
 			if (editing && (e.getKeyCode() == KeyEvent.VK_ESCAPE || 
