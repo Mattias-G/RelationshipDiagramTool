@@ -19,17 +19,18 @@ public class Gui extends JFrame {
 		setMinimumSize(new Dimension(800, 600));
 		
 		setLayout(new GridBagLayout());
+		
+		DescriptionDialogHandler ddh = new DescriptionDialogHandler(this);
 
-		GraphPanel gp = addGraphPanel(backend);
-		CategoryPanel cp = addCategoryPanel(backend);
-		TimestampPanel tp = addTimestampPanel(backend);
+		GraphPanel gp = addGraphPanel(backend, ddh);
+		CategoryPanel cp = addCategoryPanel(backend, ddh);
+		TimestampPanel tp = addTimestampPanel(backend, ddh);
 		addMenuBar(backend, gp, cp);
 		gp.setSiblingComponent(new GuiPanelGroup(cp, tp));
 		cp.setSiblingComponent(new GuiPanelGroup(gp, tp));
 		tp.setSiblingComponent(new GuiPanelGroup(gp, cp));
 		
 		setVisible(true);
-		
 	}
 
 	private void addMenuBar(Backend backend, GraphPanel graphPanel, CategoryPanel categoryPanel) {
@@ -38,8 +39,8 @@ public class Gui extends JFrame {
 		setJMenuBar(menuBar);
 	}
 	
-	private GraphPanel addGraphPanel(Backend backend) {
-		GraphPanel graphPanel = new GraphPanel(backend);
+	private GraphPanel addGraphPanel(Backend backend, DescriptionDialogHandler ddh) {
+		GraphPanel graphPanel = new GraphPanel(backend, ddh);
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.gridx = 0;
@@ -55,8 +56,8 @@ public class Gui extends JFrame {
 		return graphPanel;
 	}
 
-	private CategoryPanel addCategoryPanel(Backend backend) {
-		CategoryPanel categoryPanel = new CategoryPanel(backend, this); 
+	private CategoryPanel addCategoryPanel(Backend backend, DescriptionDialogHandler ddh) {
+		CategoryPanel categoryPanel = new CategoryPanel(backend, this, ddh); 
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.gridx = 1;
@@ -75,8 +76,8 @@ public class Gui extends JFrame {
 		return categoryPanel;
 	}
 
-	private TimestampPanel addTimestampPanel(Backend backend) {
-		TimestampPanel timestampPanel = new TimestampPanel(backend, this); 
+	private TimestampPanel addTimestampPanel(Backend backend, DescriptionDialogHandler ddh) {
+		TimestampPanel timestampPanel = new TimestampPanel(backend, this, ddh); 
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.gridx = 0;
@@ -93,8 +94,7 @@ public class Gui extends JFrame {
 		sp.setMinimumSize(new Dimension(timestampPanel.dw, timestampPanel.dh));
 		timestampPanel.registerKeyListener();
 		return timestampPanel;
-	}
-
+	}	
 
 	public static void main(String[] args) {
 		Gui g = new Gui(new Backend());

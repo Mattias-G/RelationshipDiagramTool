@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -15,8 +16,8 @@ import utils.Pair;
 @SuppressWarnings("serial")
 public class CategoryPanel extends ContentListPanel {
 	
-	public CategoryPanel(Backend backend, JFrame frame) {		
-		super(backend, frame);
+	public CategoryPanel(Backend backend, JFrame frame, DescriptionDialogHandler ddh) {		
+		super(backend, frame, ddh);
 		this.bkgColor = new Color(0.8f, 0.8f, 1.0f);
 
 		setMinimumSize(new Dimension(160, 48));
@@ -61,12 +62,16 @@ public class CategoryPanel extends ContentListPanel {
 	}
 
 	@Override
-	protected void onRightClick(GuiButtonObject target) {
+	protected void onRightClick(GuiButtonObject target, MouseEvent e) {
 		siblings.performAction(SiblingActions.setCategory, target);
 		siblings.repaint();
 		
+		// edit description
+		if (e.isControlDown()) {
+			descriptionDialogHandler.showEditingDialogue(target);
+		}
 		//Set default if double click
-		if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS) {
+		else if (System.currentTimeMillis() - lastRightClickTime < DOUBLE_CLICK_TIME_MILLIS) {
 			backend.setDefautCategory((Category)target);
 			repaint();
 		}

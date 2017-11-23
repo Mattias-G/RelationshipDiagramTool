@@ -24,6 +24,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 
 	private Backend backend;
 	private GuiPanelGroup siblings;
+	private DescriptionDialogHandler descriptionDialogHandler;
 	
 	private Node selectedNode;
 	private Edge selectedEdge;
@@ -54,11 +55,12 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	private int mouseX;
 	private int mouseY;
 	
-	public GraphPanel(Backend backend) {
+	public GraphPanel(Backend backend, DescriptionDialogHandler descriptionDialogHandler) {
 		lastLeftClickTime = 0;
 		lastRightClickTime = 0;
 		
 		this.backend = backend;
+		this.descriptionDialogHandler = descriptionDialogHandler;
 
 		MouseListener ml = new MouseListener();
 		addMouseListener(ml);
@@ -223,11 +225,15 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	}
 
 	private void rightClickOnNode(Node node, MouseEvent e) {
-		// select + draw edge
+		// select + draw edge or edit description
 		if (e.isShiftDown()) {
 			if (selectedNode != null)
 				selectedNode.isEditing = false;
 			addNodeToSelection(node);
+		}
+		else if (e.isControlDown()) {
+			descriptionDialogHandler.showEditingDialogue(node);
+			selectNode(node);
 		}
 		else {
 			selectNode(node);
@@ -245,8 +251,11 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	}
 
 	private void rightClickOnEdge(Edge edge, MouseEvent e) {
-		// select
+		// select or edit description
 		if (!e.isShiftDown()) {
+			if (e.isControlDown()) {
+				descriptionDialogHandler.showEditingDialogue(edge);
+			}
 			unselectArea();
 			edge.setSelected(true);
 			selectedEdge = edge;
@@ -293,6 +302,7 @@ public class GraphPanel extends JPanel implements GuiPanel {
 
 	private void rightDoubleClickOnEdge(Edge edge, MouseEvent e) {
 		// do nothing
+		
 	}
 
 	private void leftDoubleClickOnEmpty(int x, int y, MouseEvent e) {
@@ -314,11 +324,13 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		public void mousePressed(MouseEvent e) {
 			siblings.unfocus();
 			
-			if (!e.isShiftDown() && (selectedNode == null || !areaSelectedNodes.contains(selectedNode)))
-				unselectNode();
-			unselectEdge();
-			creatingEdge = false;
-			editing = false;
+			if (e.getButton() != MouseEvent.BUTTON2) {
+				if (!e.isShiftDown() && (selectedNode == null || !areaSelectedNodes.contains(selectedNode)))
+					unselectNode();
+				unselectEdge();
+				creatingEdge = false;
+				editing = false;
+			}
 
 			int x = transformedX(e.getX());
 			int y = transformedY(e.getY());

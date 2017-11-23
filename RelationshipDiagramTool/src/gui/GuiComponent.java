@@ -11,6 +11,7 @@ public abstract class GuiComponent {
 	protected boolean isSelected;
 	protected boolean isEditing;
 	protected String name;
+	protected String description;
 	protected int id;
 	
 	public abstract void draw(Graphics2D g2d);
@@ -31,6 +32,10 @@ public abstract class GuiComponent {
 		this.name = name;
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	public void keyTyped(char keyChar) {
 		if (keyChar == 8 || keyChar == 127) //Backspace or delete
 			delChar();
@@ -40,5 +45,12 @@ public abstract class GuiComponent {
 	
 	private void delChar() {
 		name = name.substring(0, Math.max(0,name.length()-1));
+	}
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;		
 	}
 }

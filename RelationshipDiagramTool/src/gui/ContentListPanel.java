@@ -36,6 +36,7 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 	protected GuiPanelGroup siblings;
 
 	protected GuiButtonObject selectedObject;
+//	private int selectedObjectX;
 	
 	protected boolean editing;
 	protected boolean dragging;
@@ -46,10 +47,12 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 	protected int dh;
 	
 	protected JFrame frame;
+	protected DescriptionDialogHandler descriptionDialogHandler;
 	
-	public ContentListPanel(Backend backend, JFrame frame) {		
+	public ContentListPanel(Backend backend, JFrame frame, DescriptionDialogHandler descriptionDialogHandler) {		
 		this.backend = backend;
 		this.frame = frame;
+		this.descriptionDialogHandler = descriptionDialogHandler; 
 
 		MouseListener ml = new MouseListener();
 		addMouseListener(ml);
@@ -196,7 +199,7 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 
 	protected abstract Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolean performAction);
 
-	protected abstract void onRightClick(GuiButtonObject target);
+	protected abstract void onRightClick(GuiButtonObject target, MouseEvent e);
 
 	protected abstract GuiButtonObject createNewListObject();
 	
@@ -218,6 +221,9 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 				if (ret.second() == InputReturnCode.hit) {
 					unselectObject();
 					selectedObject = ret.first();
+
+//					selectedObjectX = e.getX();
+					dragging = true;
 				}
 				else if (ret.second() != InputReturnCode.miss) {
 					repaint();
@@ -246,15 +252,12 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 					}
 				}
 				
-				if (selectedObject != null) {
-					dragging = true;
-				}
-				
 				//Edit if double click
 				if ((selectedObject != null)) {
 					if (System.currentTimeMillis() - lastLeftClickTime < DOUBLE_CLICK_TIME_MILLIS) {
 						selectedObject.setEditing(true);
 						editing = true;
+						dragging = false;
 					}
 					lastLeftClickTime = System.currentTimeMillis();
 				}
@@ -268,7 +271,7 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 				Pair<GuiButtonObject, InputReturnCode> ret = mouseInput(x, y, false);
 				
 				if (ret.first() != null) {
-					onRightClick(ret.first());
+					onRightClick(ret.first(), e);
 					lastRightClickTime = System.currentTimeMillis();
 				}
 				else
@@ -278,7 +281,20 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			if (dragging) {
+				dragging = false;
+			}
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			int x = e.getX();
 			
+			if (dragging && selectedObject != null) {
+//				selectedObjectX = x;
+			}
+//			System.out.println(x);
+			repaint();
 		}
 	}
 	

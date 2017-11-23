@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -15,8 +16,8 @@ import utils.Pair;
 @SuppressWarnings("serial")
 public class TimestampPanel extends ContentListPanel {	
 	
-	public TimestampPanel(Backend backend, JFrame frame) {	
-		super(backend, frame);
+	public TimestampPanel(Backend backend, JFrame frame, DescriptionDialogHandler ddh) {	
+		super(backend, frame, ddh);
 		this.bkgColor = new Color(0.8f, 1.0f, 0.8f);
 
 		setMinimumSize(new Dimension(0, 48));
@@ -63,12 +64,18 @@ protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolea
 	}
 
 	@Override
-	protected void onRightClick(GuiButtonObject target) {
-		//Set current
+	protected void onRightClick(GuiButtonObject target, MouseEvent e) {
+		if (e.isControlDown()) {
+			// edit description
+			descriptionDialogHandler.showEditingDialogue(target);
+		}
+		else {
+			//Set current
 			backend.makeCurrentTimestamp((Timestamp) target);
 			siblings.repaint();
 			siblings.unfocus();
 			repaint();
+		}
 	}
 
 }
