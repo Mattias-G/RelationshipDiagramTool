@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import gui.categories.Category;
@@ -545,6 +544,8 @@ public class Backend {
 
 		nodeClipboard = oldNodeClipboard;
 		edgeClipboard = oldEdgeClipboard;
+		
+		t.setColor(c.getColor());
 	}
 	
 	public void moveTimestampLeft() {
