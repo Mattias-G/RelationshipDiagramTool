@@ -18,13 +18,11 @@ public class MenuBar extends JMenuBar {
 	private JMenuItem saveItem;
 	private JMenuItem saveAsItem;
 
-	private GuiPanel graphPanel;
-	private GuiPanel categoryPanel;
+	private GuiPanelGroup panels;
 	
-	public MenuBar(SaveStateHandler saver, GuiPanel p1, GuiPanel p2) {
+	public MenuBar(SaveStateHandler saver, GuiPanelGroup gpg) {
 		this.saver = saver;
-		this.graphPanel = p1;
-		this.categoryPanel = p2;
+		this.panels = gpg;
 		
 		JMenu fileMenu = new JMenu("File");
 
@@ -51,13 +49,11 @@ public class MenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == newItem) {
 				saver.reset();
-				graphPanel.repaint();
-				categoryPanel.repaint();
+				panels.repaint();
 			}
 			else if (e.getSource() == openItem) {
 				if (saver.open(getTopLevelAncestor())) {
-					graphPanel.repaint();
-					categoryPanel.repaint();
+					panels.repaint();
 				}
 			}
 			else if (e.getSource() == saveItem) {

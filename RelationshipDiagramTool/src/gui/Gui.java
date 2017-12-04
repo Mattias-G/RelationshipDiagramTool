@@ -25,7 +25,7 @@ public class Gui extends JFrame {
 		GraphPanel gp = addGraphPanel(backend, ddh);
 		CategoryPanel cp = addCategoryPanel(backend, ddh);
 		TimestampPanel tp = addTimestampPanel(backend, ddh);
-		addMenuBar(backend, gp, cp);
+		addMenuBar(backend, new GuiPanelGroup(gp, cp, tp));
 		gp.setSiblingComponent(new GuiPanelGroup(cp, tp));
 		cp.setSiblingComponent(new GuiPanelGroup(gp, tp));
 		tp.setSiblingComponent(new GuiPanelGroup(gp, cp));
@@ -33,9 +33,9 @@ public class Gui extends JFrame {
 		setVisible(true);
 	}
 
-	private void addMenuBar(Backend backend, GraphPanel graphPanel, CategoryPanel categoryPanel) {
+	private void addMenuBar(Backend backend, GuiPanelGroup panels) {
 		SaveStateHandler saver = new SaveStateHandler(backend);
-		JMenuBar menuBar = new MenuBar(saver, graphPanel, categoryPanel);
+		JMenuBar menuBar = new MenuBar(saver, panels);
 		setJMenuBar(menuBar);
 	}
 	
