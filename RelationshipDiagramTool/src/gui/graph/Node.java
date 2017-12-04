@@ -35,6 +35,7 @@ public class Node extends GuiComponent {
 		x = original.x;
 		y = original.y;
 		name = original.name;
+		description = "";
 		width = Math.max(64, 24 + fontMetrics.stringWidth(name));
 		
 		this.id = id;
