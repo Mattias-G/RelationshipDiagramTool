@@ -3,6 +3,8 @@ package gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import gui.misc.SiblingActions;
+
 public class GuiPanelGroup {
 	private List<GuiPanel> panels = new ArrayList<>();
 	

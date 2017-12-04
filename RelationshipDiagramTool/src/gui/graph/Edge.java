@@ -17,6 +17,7 @@ public class Edge extends GuiComponent {
 		this.id = id;
 		
 		name = "";
+		description = "";
 	}
 	
 	
@@ -98,7 +99,7 @@ public class Edge extends GuiComponent {
 	
 	@Override
 	public String toString() {
-		return id + " " + startNode.getId() + " " + endNode.getId() + " " + name;
+			return id + " " + startNode.getId() + " " + endNode.getId() + " " + name + super.toString();
 	}
 	
 	public String toJson() {
@@ -106,7 +107,8 @@ public class Edge extends GuiComponent {
 					"\"id\": " + id + ",\n" +
 					"\"node1\": " + startNode.getId() + ",\n" +
 					"\"node2\": " + endNode.getId() + ",\n" +
-					"\"name\": \"" + name + "\"\n" +
+					"\"name\": \"" + name + "\",\n" +
+					super.toJson() +
 				"}";
 	}
 }

@@ -1,4 +1,4 @@
-package gui;
+package gui.misc;
 
 import java.awt.Dimension;
 
@@ -9,6 +9,8 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+
+import gui.GuiComponent;
 
 public class DescriptionDialogHandler {
 	

@@ -16,6 +16,7 @@ public abstract class GuiButtonObject extends GuiComponent {
 
 		this.id = id;
 		name = "";
+		description = "";
 	}
 
 	protected abstract int componentWidth();
@@ -100,5 +101,5 @@ public abstract class GuiButtonObject extends GuiComponent {
 	}
 
 	protected void drawInherited(Graphics2D g2d) {
-	}	
+	}
 }

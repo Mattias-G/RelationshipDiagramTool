@@ -17,6 +17,8 @@ import backend.Backend;
 import gui.categories.Category;
 import gui.graph.Edge;
 import gui.graph.Node;
+import gui.misc.DescriptionDialogHandler;
+import gui.misc.SiblingActions;
 
 @SuppressWarnings("serial")
 public class GraphPanel extends JPanel implements GuiPanel {

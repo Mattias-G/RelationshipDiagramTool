@@ -18,8 +18,9 @@ public class Node extends GuiComponent {
 		height = 32;
 		this.x = x - width / 2;
 		this.y = y - height / 2;
-		
+
 		name = "";
+		description = "";
 		
 		category = c;
 		
@@ -124,7 +125,7 @@ public class Node extends GuiComponent {
 	
 	@Override
 	public String toString() {
-		return id + " " + x + " " + y + " " + category.getId() + " " + name;
+		return id + " " + x + " " + y + " " + category.getId() + " " + name + super.toString();
 	}
 	
 	public String toJson() {
@@ -133,7 +134,8 @@ public class Node extends GuiComponent {
 					"\"x\": " + x + ",\n" +
 					"\"y\": " + y + ",\n" +
 					"\"category\": " + category.getId() + ",\n" +
-					"\"name\": \"" + name + "\"\n" +
+					"\"name\": \"" + name + "\",\n" +
+					super.toJson() +
 				"}";
 	}
 }

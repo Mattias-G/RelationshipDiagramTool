@@ -153,24 +153,26 @@ public class Backend {
 							Integer.parseInt(tokens[0]),
 							Boolean.parseBoolean(tokens[1]),
 							Integer.parseInt(tokens[2]),
-							line.substring(i));
+							line.substring(i),
+							readDescription(reader));
 				}
 				else if (step == 2) {
-					String[] tokens = line.split(" ");
-					int i = tokens[0].length() + 1;
 					createTimestamp(
-							line.substring(i));
+							line,
+							readDescription(reader));
 				}
 				else if (step == 3) {
 					String[] tokens = line.split(" ");
 					int i = tokens[0].length() + tokens[1].length() + 
 							tokens[2].length() + tokens[3].length() + 4;
+					
 					createNode(
 							Integer.parseInt(tokens[0]),
 							Integer.parseInt(tokens[1]),
 							Integer.parseInt(tokens[2]),
 							findCategory(Integer.parseInt(tokens[3])),
-							line.substring(i));
+							line.substring(i),
+							readDescription(reader));
 				}
 				else if (step == 4) {
 					String[] tokens = line.split(" ");
@@ -179,7 +181,8 @@ public class Backend {
 							Integer.parseInt(tokens[0]),
 							findNode(Integer.parseInt(tokens[1])),
 							findNode(Integer.parseInt(tokens[2])),
-							line.substring(i));
+							line.substring(i),
+							readDescription(reader));
 				}
 				else if (step != -1) {
 					reset();
@@ -197,6 +200,19 @@ public class Backend {
 		}
 	}
 	
+	private String readDescription(BufferedReader reader) throws NumberFormatException, IOException {
+		int l = Integer.parseInt(reader.readLine());
+		
+		StringBuilder sb = new StringBuilder();
+		while (sb.length() < l) {
+			sb.append(reader.readLine());
+			if (sb.length() < l)
+				sb.append("\n");
+		}
+				
+		return sb.toString();
+	}
+	
 	private void loadFromJson(File file) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			reader.readLine();
@@ -204,14 +220,15 @@ public class Backend {
 			//Read categories
 			reader.readLine();
 			while (reader.readLine().equals("{")) {
-				String[] tokens = new String[4];
+				String[] tokens = new String[5];
 				getTokens(reader, tokens);
 						
 				createCategory(
 						Integer.parseInt(tokens[0]),
 						Boolean.parseBoolean(tokens[1]),
 						Integer.parseInt(tokens[2]),
-						tokens[3]);
+						tokens[3],
+						tokens[4]);
 				
 				reader.readLine();
 			}
@@ -219,15 +236,16 @@ public class Backend {
 			//Read timestamps
 			reader.readLine();
 			while (reader.readLine().equals("{")) {
-				String[] tokens = new String[1];
-				getTokens(reader, tokens);
-						
-				createTimestamp(tokens[0]);
+				String[] tokens = new String[2];
+				getTokens(reader, tokens); 
+				
+				//token 1 is not actually the last so there's an extra ',' at the end.
+				createTimestamp(tokens[0], tokens[1].substring(0, tokens[1].length()-1));
 							
 				//Read nodes
 				reader.readLine();
 				while (reader.readLine().equals("{")) {
-					tokens = new String[5];
+					tokens = new String[6];
 					getTokens(reader, tokens);
 							
 					createNode(
@@ -235,7 +253,8 @@ public class Backend {
 							Integer.parseInt(tokens[1]),
 							Integer.parseInt(tokens[2]),
 							findCategory(Integer.parseInt(tokens[3])),
-							tokens[4]);
+							tokens[4],
+							tokens[5]);
 					
 					reader.readLine();
 				}
@@ -243,14 +262,15 @@ public class Backend {
 				//Read edges
 				reader.readLine();
 				while (reader.readLine().equals("{")) {
-					tokens = new String[4];
+					tokens = new String[5];
 					getTokens(reader, tokens);
 					
 					createEdge(
 							Integer.parseInt(tokens[0]),
 							findNode(Integer.parseInt(tokens[1])),
 							findNode(Integer.parseInt(tokens[2])),
-							tokens[3]);
+							tokens[3],
+							tokens[4]);
 					
 					reader.readLine();
 				}
@@ -269,8 +289,11 @@ public class Backend {
 	private void getTokens(BufferedReader reader, String[] tokens) throws IOException {
 		for (int i = 0; i < tokens.length; i++) {
 			String line = reader.readLine();
-			if (i == tokens.length-1)
-				tokens[i] = line.substring(line.indexOf(':')+3,line.length()-1);
+			if (i == tokens.length-1) {
+				tokens[i] = line.substring(line.indexOf(':')+3,line.length()-1).replaceAll("\\\\n", "\n");
+			}
+			else if (i == tokens.length-2)
+				tokens[i] = line.substring(line.indexOf(':')+3,line.length()-2);
 			else
 				tokens[i] = line.substring(line.indexOf(':')+2,line.length()-1);
 		}
@@ -287,11 +310,12 @@ public class Backend {
 		return category;
 	}
 	
-	private void createCategory(int id, boolean visible, int color, String name) {
+	private void createCategory(int id, boolean visible, int color, String name, String description) {
 		Category category = new Category(id);
 		category.setVisible(visible);
 		category.setColor(new Color(color));
 		category.setName(name);
+		category.setDescription(description);
 		categories.add(category);
 		
 		if (defaultCategory == noCategory)
@@ -343,9 +367,10 @@ public class Backend {
 		return node;
 	}
 
-	private void createNode(int id, int x, int y, Category category, String name) {
+	private void createNode(int id, int x, int y, Category category, String name, String description) {
 		Node node = new Node(x, y, category, id);
 		node.setName(name);
+		node.setDescription(description);
 		timestamps.get(currentTime).addNode(node);
 
 		if (id >= idCounter)
@@ -375,9 +400,10 @@ public class Backend {
 		return edge;
 	}
 
-	private void createEdge(int id, Node start, Node end, String name) {
+	private void createEdge(int id, Node start, Node end, String name, String description) {
 		Edge edge = new Edge(start, end, id);
 		edge.setName(name);
+		edge.setDescription(description);
 		timestamps.get(currentTime).addEdge(edge);
 
 		if (id >= idCounter)
@@ -404,9 +430,17 @@ public class Backend {
 	public Timestamp createTimestamp() {
 		return createTimestamp("Time step " + timestamps.size());
 	}
-	
+
 	public Timestamp createTimestamp(String name) {
 		Timestamp timestamp = new Timestamp(name);
+		timestamps.add(timestamp);
+		currentTime = timestamps.size()-1;
+		return timestamp;
+	}
+	
+	private Timestamp createTimestamp(String name, String description) {
+		Timestamp timestamp = new Timestamp(name);
+		timestamp.setDescription(description);
 		timestamps.add(timestamp);
 		currentTime = timestamps.size()-1;
 		return timestamp;

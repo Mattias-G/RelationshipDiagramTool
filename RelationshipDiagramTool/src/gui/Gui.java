@@ -9,6 +9,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 
 import backend.Backend;
+import gui.misc.DescriptionDialogHandler;
 import utils.SaveStateHandler;
 
 @SuppressWarnings("serial")

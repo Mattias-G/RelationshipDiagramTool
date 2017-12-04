@@ -96,14 +96,14 @@ public class Timestamp extends GuiButtonObject {
 	
 	@Override
 	public String toString() {
-		return name;
+		return name + super.toString();
 	}
 	
 	public String toJson() {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("{\n" +
-		"\"name\": \"" + name + "\"\n");
+		"\"name\": \"" + name + "\",\n" + super.toJson().substring(0, super.toJson().length()-1) + ",\n");
 				
 		sb.append("\"nodes\": [\n");
 

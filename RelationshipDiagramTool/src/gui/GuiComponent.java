@@ -53,4 +53,19 @@ public abstract class GuiComponent {
 	public void setDescription(String description) {
 		this.description = description;		
 	}
+	
+	@Override
+	public String toString() {
+		description = description.trim();
+		if (description.length() > 0) {
+			System.out.println(description);
+			return "\n" + description.length() + "\n" + description;
+		}
+		return "\n" + 0;
+	}
+
+	public String toJson() {
+		String d = description.replaceAll("\n", "\\\\n");
+		return "\"description\": \"" + d + "\"\n";
+	}	
 }

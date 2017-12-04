@@ -11,6 +11,7 @@ import backend.Backend;
 import gui.categories.GuiButtonObject;
 import gui.categories.InputReturnCode;
 import gui.graph.Timestamp;
+import gui.misc.DescriptionDialogHandler;
 import utils.Pair;
 
 @SuppressWarnings("serial")

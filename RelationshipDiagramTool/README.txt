@@ -23,8 +23,6 @@
 
 - Press and hold the left mouse button on an empty space to make a regional selection, release the mouse to select all node in the selected area
 
-- Press + or - to move between time layers. These are different graphs that represent different points in time (or space if you prefer).
-
 
 < Category panel >
 
@@ -39,6 +37,20 @@
 
 - Left click on the square next to 'visible' to toggle if the nodes of that category should be visible or hidden
 - Left click on the square next to 'color' to change the color of the category and its nodes
+
+
+< Time layer panel >
+
+- Left click on the dotted outline with a '+' to add a new time step. These are different graphs that represent different points in time (or space if you prefer).
+
+- Left click on a time step to select it
+- Left click twice on a time step to rename it
+- Select a time step and press the Delete key to remove it (this will destroy all nodes and edges within the time step)
+
+- Right click on a time step to display it in the graph panel. Current time step is indicated with a small square in the upper left corner.
+- Press + or - to move between time layers. Moving out of bounds will create a new time step first or last in the list.
+
+- Left click on the square next to 'color' to change the color of the time step
 
 
 < Menu bar >

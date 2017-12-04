@@ -11,6 +11,8 @@ import backend.Backend;
 import gui.categories.Category;
 import gui.categories.GuiButtonObject;
 import gui.categories.InputReturnCode;
+import gui.misc.DescriptionDialogHandler;
+import gui.misc.SiblingActions;
 import utils.Pair;
 
 @SuppressWarnings("serial")

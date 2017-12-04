@@ -24,6 +24,8 @@ import gui.categories.Category;
 import gui.categories.GuiButtonObject;
 import gui.categories.InputReturnCode;
 import gui.graph.Timestamp;
+import gui.misc.DescriptionDialogHandler;
+import gui.misc.SiblingActions;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -284,17 +286,6 @@ public abstract class ContentListPanel extends JPanel implements GuiPanel, Scrol
 			if (dragging) {
 				dragging = false;
 			}
-		}
-		
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			int x = e.getX();
-			
-			if (dragging && selectedObject != null) {
-//				selectedObjectX = x;
-			}
-//			System.out.println(x);
-			repaint();
 		}
 	}
 	

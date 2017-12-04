@@ -54,7 +54,7 @@ public class Category extends GuiButtonObject {
 	
 	@Override
 	public String toString() {
-		return id + " " + visible + " " + color.getRGB() + " " + name;
+		return id + " " + visible + " " + color.getRGB() + " " + name + super.toString();
 	}
 	
 	public String toJson() {
@@ -62,7 +62,8 @@ public class Category extends GuiButtonObject {
 					"\"id\": " + id + ",\n" +
 					"\"visible\": " + visible + ",\n" +
 					"\"color\": " + color.getRGB() + ",\n" +
-					"\"name\": \"" + name + "\"\n" +
+					"\"name\": \"" + name + "\",\n" +
+					super.toJson() +
 				"}";
 	}
 }
