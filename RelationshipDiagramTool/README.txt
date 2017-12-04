@@ -23,6 +23,12 @@
 
 - Press and hold the left mouse button on an empty space to make a regional selection, release the mouse to select all node in the selected area
 
+- Hold shift and click on a node to add it to an existing selection.
+- Hold shift and make a regional selection to add the region to an existing selection.
+
+- Press Ctrl+c to copy the selected nodes and edges between them.
+- Press Ctrl+v to paste copied nodes. 
+
 
 < Category panel >
 
@@ -51,6 +57,17 @@
 - Press + or - to move between time layers. Moving out of bounds will create a new time step first or last in the list.
 
 - Left click on the square next to 'color' to change the color of the time step
+
+- Press <- or -> to reorder time layers.
+- Press Ctrl+d to duplicate a time layer.
+
+
+< Description panel >
+
+- Hold Ctrl and Right click on a node, edge, category or time step to open a description editor.
+- Text written in this window exists per object.
+- The window's title will show the name of the object.
+- Close the window with the X in the corner of it. 
 
 
 < Menu bar >

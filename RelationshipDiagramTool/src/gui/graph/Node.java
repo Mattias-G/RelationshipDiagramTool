@@ -32,8 +32,8 @@ public class Node extends GuiComponent {
 		width = 64;
 		height = 32;
 		category = original.category;
-		x = original.x+16;
-		y = original.y+16;
+		x = original.x;
+		y = original.y;
 		name = original.name;
 		
 		this.id = id;

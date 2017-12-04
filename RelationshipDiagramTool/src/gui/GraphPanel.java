@@ -552,15 +552,31 @@ public class GraphPanel extends JPanel implements GuiPanel {
 				if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD)) {
 					backend.nextTimestamp();
 					repaint = true;
+					siblings.performAction(SiblingActions.addTimestamp);
 					siblings.repaint();
 				}
 				if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
 					backend.prevTimestamp();
 					repaint = true;
+					siblings.performAction(SiblingActions.addTimestamp);
+					siblings.repaint();
+				}
+				if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_LEFT)) {
+					backend.moveTimestampLeft();
+					siblings.repaint();
+				}
+				if (!editing && !siblings.anyoneEditing() && (e.getKeyCode() == KeyEvent.VK_RIGHT)) {
+					backend.moveTimestampRight();
 					siblings.repaint();
 				}
 
-
+				if (e.getKeyCode() == KeyEvent.VK_D && e.isControlDown()) {
+					backend.duplicateTimestamp();
+					repaint = true;
+					siblings.performAction(SiblingActions.addTimestamp);
+					siblings.repaint();
+				}
+				
 				if (e.getKeyCode() == KeyEvent.VK_A && e.isControlDown()) {
 					unselectNode();
 					unselectEdge();

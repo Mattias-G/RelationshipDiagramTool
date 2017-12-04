@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import gui.categories.Category;
@@ -26,6 +27,7 @@ public class Backend {
 	private Category noCategory;
 	
 	private int currentTime;
+	private int clipboardTime;
 
 	public Backend() {
 		noCategory = new Category(idCounter++);
@@ -36,6 +38,7 @@ public class Backend {
 		
 		timestamps.add(new Timestamp("Time step " + timestamps.size()));
 		currentTime = 0;
+		clipboardTime = 0;
 	}
 
 
@@ -488,6 +491,7 @@ public class Backend {
 	public void copyNodes(List<Node> nodes) {
 		nodeClipboard.clear();
 		edgeClipboard.clear();
+		clipboardTime = currentTime;
 		
 		for (Node original : nodes) {
 			Node node = new Node(original, -1);
@@ -508,6 +512,8 @@ public class Backend {
 		List<Node> list = new ArrayList<>(); 
 		for (Node original : nodeClipboard) {
 			Node node = new Node(original, idCounter++);
+			if (clipboardTime == currentTime)
+				node.setPosition(node.getX()+16, node.getY()+16);
 			list.add(node);
 			timestamps.get(currentTime).addNode(node);
 		}
@@ -519,6 +525,44 @@ public class Backend {
 		}
 		
 		return list;
+	}
+
+
+	public void duplicateTimestamp() {
+		int ct = currentTime;
+		Timestamp c = timestamps.get(currentTime);
+		Timestamp t = createTimestamp();
+		currentTime = ct;
+		timestamps.remove(timestamps.size()-1);
+		timestamps.add(currentTime+1, t);
+
+		List<Node> oldNodeClipboard = new ArrayList<>(nodeClipboard);
+		List<EdgeCopyConstruct> oldEdgeClipboard = new ArrayList<>(edgeClipboard);
+		
+		copyNodes(c.getNodes());
+		currentTime++;
+		pasteNodes();
+
+		nodeClipboard = oldNodeClipboard;
+		edgeClipboard = oldEdgeClipboard;
+	}
+	
+	public void moveTimestampLeft() {
+		if (currentTime > 0) {
+			Timestamp t = timestamps.get(currentTime);
+			timestamps.remove(t);
+			timestamps.add(currentTime-1, t);
+			currentTime--;
+		}
+	}
+
+	public void moveTimestampRight() {
+		if (currentTime < timestamps.size()-1) {
+			Timestamp t = timestamps.get(currentTime);
+			timestamps.remove(t);
+			timestamps.add(currentTime+1, t);
+			currentTime++;
+		}
 	}
 	
 }

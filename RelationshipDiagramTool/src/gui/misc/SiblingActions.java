@@ -1,5 +1,6 @@
 package gui.misc;
 
 public enum SiblingActions {
-	setCategory;
+	setCategory,
+	addTimestamp;
 }

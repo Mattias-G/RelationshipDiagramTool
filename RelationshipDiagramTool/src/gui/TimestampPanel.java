@@ -8,10 +8,13 @@ import java.util.List;
 import javax.swing.JFrame;
 
 import backend.Backend;
+import gui.categories.Category;
 import gui.categories.GuiButtonObject;
 import gui.categories.InputReturnCode;
+import gui.graph.Node;
 import gui.graph.Timestamp;
 import gui.misc.DescriptionDialogHandler;
+import gui.misc.SiblingActions;
 import utils.Pair;
 
 @SuppressWarnings("serial")
@@ -52,8 +55,8 @@ public class TimestampPanel extends ContentListPanel {
 		return (i == backend.getCurrentTimestampIndex());
 	}
   
-@Override
-protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
+	@Override
+	protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolean performAction) {
 		List<Timestamp> timestamps = backend.getTimestamps();
 		for (int i = 0; i < timestamps.size(); i++) {
 			InputReturnCode rc = timestamps.get(i).mouseInput(x, y, performAction);
@@ -78,5 +81,14 @@ protected Pair<GuiButtonObject, InputReturnCode> mouseInput(int x, int y, boolea
 			repaint();
 		}
 	}
-
+	
+	@Override
+	public void performAction(SiblingActions actionCode, Object... params) {
+		if (actionCode == SiblingActions.addTimestamp) {
+			getParent().revalidate();
+			if (sizeUpdate()) {
+				frame.revalidate();
+			}
+		}
+	}
 }
