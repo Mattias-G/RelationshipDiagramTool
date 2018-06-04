@@ -5,19 +5,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 
-import gui.GuiComponent;
-
-public class Edge extends GuiComponent {
+public class Edge extends GraphComponent {
 	private Node startNode;
 	private Node endNode;
 	
 	public Edge(Node startNode, Node endNode, int id) {
+		super();
 		this.startNode = startNode;
 		this.endNode = endNode;
 		this.id = id;
-		
-		name = "";
-		description = "";
 	}
 	
 	
@@ -52,6 +48,10 @@ public class Edge extends GuiComponent {
 			if (isSelected) {
 				g2d.setColor(Color.BLUE);
 				g2d.drawRect(x - w/2, y - h/2, w, h);
+			}
+			else if (isHoveredOn) {
+				g2d.setColor(hoverHighlightColor);
+				g2d.fillRect(x - w/2, y - h/2, w, h);
 			}
 			
 			w = fontMetrics.stringWidth(name);
@@ -101,7 +101,8 @@ public class Edge extends GuiComponent {
 	public String toString() {
 			return id + " " + startNode.getId() + " " + endNode.getId() + " " + name + super.toString();
 	}
-	
+
+	@Override
 	public String toJson() {
 		return 	"{\n" +
 					"\"id\": " + id + ",\n" +

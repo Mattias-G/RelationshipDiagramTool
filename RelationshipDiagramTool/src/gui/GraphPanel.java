@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import backend.Backend;
 import gui.categories.Category;
 import gui.graph.Edge;
+import gui.graph.GraphComponent;
 import gui.graph.Node;
 import gui.misc.DescriptionDialogHandler;
 import gui.misc.SiblingActions;
@@ -57,6 +58,8 @@ public class GraphPanel extends JPanel implements GuiPanel {
 	private int mouseX;
 	private int mouseY;
 	
+	private GraphComponent mouseHoverTarget;
+	
 	public GraphPanel(Backend backend, DescriptionDialogHandler descriptionDialogHandler) {
 		lastLeftClickTime = 0;
 		lastRightClickTime = 0;
@@ -96,57 +99,62 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		}
 	}
 
-  private void selectNode(Node node)
-  {
-    selectedNode = node;
-    if (!areaSelectedNodes.contains(node))
-      unselectArea();
-    node.setSelected(true);
-  }
+	private void selectNode(Node node) {
+		selectedNode = node;
+		if (!areaSelectedNodes.contains(node))
+			unselectArea();
+		node.setSelected(true);
+	}
 
 	private void selectNodesInArea(int x1, int y1, int x2, int y2) {
 		for (Node node : backend.getNodes()) {
-			if (node.isVisible() && node.coveredByArea(x1,y1,x2,y2)) {
+			if (node.isVisible() && node.coveredByArea(x1, y1, x2, y2)) {
 				areaSelectedNodes.add(node);
 				node.setSelected(true);
 			}
 		}
 	}
 
-  private void addNodesInAreaToSelection(int x1, int y1, int x2, int y2) {
-    for (Node node : backend.getNodes()) {
-      if (node.isVisible() && node.coveredByArea(x1,y1,x2,y2)) {
-        addNodeToSelection(node);
-      }
-    }
-  }
-  
-  private void addNodeToSelection(Node node) {
-    if (areaSelectedNodes.isEmpty() && selectedNode != null) {
-      areaSelectedNodes.add(selectedNode);
-      selectedNode = null;
-    }
-      
-    if (!node.isSelected) {
-      areaSelectedNodes.add(node);
-      node.setSelected(true);
-    }
-  }
+	private void addNodesInAreaToSelection(int x1, int y1, int x2, int y2) {
+		for (Node node : backend.getNodes()) {
+			if (node.isVisible() && node.coveredByArea(x1, y1, x2, y2)) {
+				addNodeToSelection(node);
+			}
+		}
+	}
 
-  private void unselectArea() {
-    if (!areaSelectedNodes.isEmpty()) {
-      for (Node node : areaSelectedNodes) {
-        node.setSelected(false);
-      }
-      areaSelectedNodes.clear();
-    }
-  }
+	private void addNodeToSelection(Node node) {
+		if (areaSelectedNodes.isEmpty() && selectedNode != null) {
+			areaSelectedNodes.add(selectedNode);
+			selectedNode = null;
+		}
+
+		if (!node.isSelected) {
+			areaSelectedNodes.add(node);
+			node.setSelected(true);
+		}
+	}
+
+	private void unselectArea() {
+		if (!areaSelectedNodes.isEmpty()) {
+			for (Node node : areaSelectedNodes) {
+				node.setSelected(false);
+			}
+			areaSelectedNodes.clear();
+		}
+	}
 	
+  	/**
+  	 * Converts mouse x to world x (taking zoom and pan into account).
+  	 */
 	private int transformedX(int x) {
 		int vx = (int)(getWidth()/2 * zoom - (getWidth()/2 - viewX));
 		return x * zoom - vx;
 	}
-	
+
+  	/**
+  	 * Converts mouse y to world y (taking zoom and pan into account).
+  	 */
 	private int transformedY(int y) {
 		int vy = (int)(getHeight()/2 * zoom - (getHeight()/2 - viewY));
 		return y * zoom - vy;
@@ -487,13 +495,39 @@ public class GraphPanel extends JPanel implements GuiPanel {
 		}
 		
 		@Override
+		public void mouseMoved(MouseEvent e) {
+			GraphComponent oldTarget = mouseHoverTarget;
+			
+			int x = transformedX(e.getX());
+			int y = transformedY(e.getY());
+			Node node = backend.findNodeAtPoint(x, y);
+			Edge edge = backend.findEdgeAtPoint(x, y);
+						
+			if (mouseHoverTarget != null) {
+				mouseHoverTarget.toggleMouseHover(false);			
+				mouseHoverTarget = null;
+			}
+			if (node != null) {
+				node.toggleMouseHover(true);
+				mouseHoverTarget = node;
+			}
+			else if (edge != null) {
+				edge.toggleMouseHover(true);
+				mouseHoverTarget = edge;
+			}
+			
+			if (oldTarget != mouseHoverTarget) {
+				repaint();
+			}
+		}
+		
+		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			zoom += e.getWheelRotation();
 			zoom = Math.max(1, Math.min(zoom, 10));
 			repaint();
 		}
 	}
-	
 	
 	private class KeyListener extends KeyAdapter {
 		@Override

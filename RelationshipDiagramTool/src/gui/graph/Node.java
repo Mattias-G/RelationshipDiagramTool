@@ -3,10 +3,9 @@ package gui.graph;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import gui.GuiComponent;
 import gui.categories.Category;
 
-public class Node extends GuiComponent {
+public class Node extends GraphComponent {
 	private int x;
 	private int y;
 	private int width;
@@ -14,13 +13,11 @@ public class Node extends GuiComponent {
 	private Category category;
 	
 	public Node(int x, int y, Category c, int id) {
+		super();
 		width = 64;
 		height = 32;
 		this.x = x - width / 2;
 		this.y = y - height / 2;
-
-		name = "";
-		description = "";
 		
 		category = c;
 		
@@ -29,13 +26,13 @@ public class Node extends GuiComponent {
 	
 	
 	public Node(Node original, int id) {
+		super();
 		width = 64;
 		height = 32;
 		category = original.category;
 		x = original.x;
 		y = original.y;
 		name = original.name;
-		description = "";
 		width = Math.max(64, 24 + fontMetrics.stringWidth(name));
 		
 		this.id = id;
@@ -59,6 +56,10 @@ public class Node extends GuiComponent {
 			if (isSelected) {
 				g2d.setColor(Color.BLUE);
 				g2d.drawRect(x, y, width, height);
+			}
+			else if (isHoveredOn) {
+				g2d.setColor(hoverHighlightColor);
+				g2d.fillRect(x, y, width, height);
 			}
 			
 			int w = fontMetrics.stringWidth(name);
@@ -129,7 +130,8 @@ public class Node extends GuiComponent {
 	public String toString() {
 		return id + " " + x + " " + y + " " + category.getId() + " " + name + super.toString();
 	}
-	
+
+	@Override
 	public String toJson() {
 		return 	"{\n" +
 					"\"id\": " + id + ",\n" +
